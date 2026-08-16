@@ -8,7 +8,7 @@ const commonConfig = {
 };
 
 export default (baseURL) => {
-    const apiBaseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const apiBaseURL = "https://quanlythuvien-mevn.onrender.com";
     
     return axios.create({
         baseURL: apiBaseURL + baseURL,
