@@ -2,7 +2,7 @@ import createApiClient from "./api.service";
 
 class TheoDoiMuonSachService {
     constructor(baseUrl = "/api/theodoimuonsach") {
-        this.api = createApiClient("http://localhost:3000" + baseUrl);
+        this.api = createApiClient(baseUrl);
     }
     async getAll() { return (await this.api.get("/")).data; }
     async create(data) { return (await this.api.post("/", data)).data; }

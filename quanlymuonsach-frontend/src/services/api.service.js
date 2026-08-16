@@ -8,8 +8,10 @@ const commonConfig = {
 };
 
 export default (baseURL) => {
+    const apiBaseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    
     return axios.create({
-        baseURL,
+        baseURL: apiBaseURL + baseURL,
         ...commonConfig,
     });
 };

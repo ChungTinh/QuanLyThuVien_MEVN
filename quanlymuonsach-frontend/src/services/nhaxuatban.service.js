@@ -1,6 +1,6 @@
 import createApiClient from "./api.service";
 class NhaXuatBanService {
-    constructor(baseUrl = "/api/nhaxuatban") { this.api = createApiClient("http://localhost:3000" + baseUrl); }
+    constructor(baseUrl = "/api/nhaxuatban") { this.api = createApiClient(baseUrl); }
     
     async getAll(params) { return (await this.api.get("/", { params })).data; }
     async create(data) { return (await this.api.post("/", data)).data; }

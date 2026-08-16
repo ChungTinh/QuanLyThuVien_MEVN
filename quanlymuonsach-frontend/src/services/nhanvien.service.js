@@ -2,7 +2,7 @@ import createApiClient from "./api.service";
 
 class NhanVienService {
     constructor(baseUrl = "/api/nhanvien") {
-        this.api = createApiClient("http://localhost:3000" + baseUrl);
+        this.api = createApiClient(baseUrl);
     }
     async login(data) { return (await this.api.post("/login", data)).data; }
     

@@ -2,7 +2,7 @@ import createApiClient from "./api.service";
 
 class SachService {
     constructor(baseUrl = "/api/sach") {
-        this.api = createApiClient("http://localhost:3000" + baseUrl);
+        this.api = createApiClient(baseUrl);
     }
     
     async getAll(params) {

@@ -2,7 +2,7 @@ import createApiClient from "./api.service";
 
 class DocGiaService {
     constructor(baseUrl = "/api/docgia") {
-        this.api = createApiClient("http://localhost:3000" + baseUrl);
+        this.api = createApiClient(baseUrl);
     }
     async getAll(params) { return (await this.api.get("/", { params })).data; }
     async login(data) { return (await this.api.post("/login", data)).data; }
