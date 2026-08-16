@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-app.use(cors()); 
 const app = express();
+app.use(cors()); 
 
 const ApiError = require("./app/api-error");
 const nhaxuatbanRouter = require("./app/routes/nhaxuatban.route");
