@@ -80,33 +80,33 @@ exports.findOne = async (req, res, next) => {
 };
 
 // Cập nhật Sách
+// Cập nhật Sách
 exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0 && !req.file) {
         return next(new ApiError(400, "Dữ liệu cập nhật không được rỗng"));
     }
 
     if (req.file) {
-    // Tạo tên file độc nhất 
-    const fileName = Date.now() + "-" + req.file.originalname.replace(/\s+/g, '-');
-    
-    // push file lên mây Supabase
-    const { data, error } = await supabase.storage
-        .from('quanlythuvien') // Tên bucket 
-        .upload(fileName, req.file.buffer, {
-            contentType: req.file.mimetype,
-        });
+        // Tạo tên file độc nhất 
+        const fileName = Date.now() + "-" + req.file.originalname.replace(/\s+/g, '-');
+        
+        // push file lên mây Supabase
+        const { data, error } = await supabase.storage
+            .from('quanlythuvien') // Tên bucket 
+            .upload(fileName, req.file.buffer, {
+                contentType: req.file.mimetype,
+            });
 
         if (error) {
             return res.status(400).send({ message: "Lỗi thật từ Supabase: " + error.message });
         }
-    }
 
-    const { data: publicUrlData } = supabase.storage
-        .from('quanlythuvien')
-        .getPublicUrl(fileName);
+        const { data: publicUrlData } = supabase.storage
+            .from('quanlythuvien')
+            .getPublicUrl(fileName);
 
-    req.body.HinhAnh = publicUrlData.publicUrl;
-}
+        req.body.HinhAnh = publicUrlData.publicUrl;
+    } // <--- CHÚ Ý: Đóng ngoặc nhọn của if (req.file) ở đúng chỗ này!
 
     try {
         const sachService = new SachService(MongoDB.client);
