@@ -96,8 +96,9 @@ exports.update = async (req, res, next) => {
             contentType: req.file.mimetype,
         });
 
-    if (error) {
-        throw new Error("Lỗi khi upload ảnh lên đám mây!");
+        if (error) {
+            return res.status(400).send({ message: "Lỗi thật từ Supabase: " + error.message });
+        }
     }
 
     const { data: publicUrlData } = supabase.storage
