@@ -4,48 +4,68 @@ const ApiError = require("../api-error");
 
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
+
+// Khởi tạo Supabase client
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
+// Helper function: Tách đuôi file và đổi tên để tránh lỗi ký tự đặc biệt
+const generateSafeFileName = (originalName) => {
+    const ext = originalName.split('.').pop();
+    return `${Date.now()}.${ext}`;
+};
 
 
 // Tạo và lưu 1 Sách mới
 exports.create = async (req, res, next) => {
     if (!req.body?.MaSach) {
-        return next(new ApiError(400, "Mã Sách không được để trống"));
+        return next(new ApiError(400, "Mã Sách không được để trống!"));
     }
 
+    // Xử lý upload ảnh 
     if (req.file) {
-    // Tạo tên file độc nhất 
-    const fileName = Date.now() + "-" + req.file.originalname.replace(/\s+/g, '-');
-    
-    // push file lên mây Supabase
-    const { data, error } = await supabase.storage
-        .from('quanlythuvien') // Tên bucket 
-        .upload(fileName, req.file.buffer, {
-            contentType: req.file.mimetype,
-        });
+        // Kiểm tra xem file đã vào được RAM chưa 
+        if (!req.file.buffer) {
+            return next(new ApiError(400, "[Lỗi Hệ Thống]: Bộ đệm file trống. Vui lòng kiểm tra lại upload.middleware.js."));
+        }
 
-    if (error) {
-        throw new Error("Lỗi khi upload ảnh lên đám mây!");
+        const fileName = generateSafeFileName(req.file.originalname);
+        
+        try {
+            // Đẩy file lên Supabase Storage
+            const { error: uploadError } = await supabase.storage
+                .from('quanlythuvien')
+                .upload(fileName, req.file.buffer, {
+                    contentType: req.file.mimetype,
+                });
+
+            if (uploadError) {
+                return next(new ApiError(400, `[Supabase Upload Error]: ${uploadError.message}`));
+            }
+
+            // Lấy link ảnh công khai từ Supabase Storage
+            const { data: publicUrlData } = supabase.storage
+                .from('quanlythuvien')
+                .getPublicUrl(fileName);
+
+            // Gán link ảnh vào dữ liệu trước khi lưu vào MongoDB
+            req.body.HinhAnh = publicUrlData.publicUrl;
+
+        } catch (error) {
+            return next(new ApiError(500, `[Supabase System Error]: ${error.message}`));
+        }
     }
-
-    const { data: publicUrlData } = supabase.storage
-        .from('quanlythuvien')
-        .getPublicUrl(fileName);
-
-    req.body.HinhAnh = publicUrlData.publicUrl;
-}
     
+    // Lưu thông tin sách vào MongoDB
     try {
         const sachService = new SachService(MongoDB.client);
         const document = await sachService.create(req.body);
         return res.send(document);
     } catch (error) {
-        return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Sách"));
+        return next(new ApiError(500, "Hệ thống gặp sự cố khi lưu Sách vào Cơ sở dữ liệu."));
     }
 };
 
-// Lấy danh sách tất cả Sách
+// Lấy danh sách tất cả Sách (có thể lọc theo tên sách)
 exports.findAll = async (req, res, next) => {
     let documents = [];
     try {
@@ -60,7 +80,7 @@ exports.findAll = async (req, res, next) => {
             documents = await sachService.find({});
         }
     } catch (error) {
-        return next(new ApiError(500, "Đã xảy ra lỗi khi lấy danh sách Sách"));
+        return next(new ApiError(500, "Lỗi truy xuất danh sách sách từ Cơ sở dữ liệu."));
     }
     return res.send(documents);
 };
@@ -71,52 +91,60 @@ exports.findOne = async (req, res, next) => {
         const sachService = new SachService(MongoDB.client);
         const document = await sachService.findById(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "Không tìm thấy Sách"));
+            return next(new ApiError(404, `Không tìm thấy Sách với ID: ${req.params.id}`));
         }
         return res.send(document);
     } catch (error) {
-        return next(new ApiError(500, `Lỗi khi lấy Sách có id=${req.params.id}`));
+        return next(new ApiError(500, "Lỗi truy xuất thông tin Sách."));
     }
 };
 
-// Cập nhật Sách
-// Cập nhật Sách
+// Cập nhật thông tin Sách
 exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0 && !req.file) {
-        return next(new ApiError(400, "Dữ liệu cập nhật không được rỗng"));
+        return next(new ApiError(400, "Form gửi lên trống, không có dữ liệu nào để cập nhật!"));
     }
 
+    // Xử lý upload ảnh nếu có file gửi lên
     if (req.file) {
-        // Tạo tên file độc nhất 
-        const fileName = Date.now() + "-" + req.file.originalname.replace(/\s+/g, '-');
-        
-        // push file lên mây Supabase
-        const { data, error } = await supabase.storage
-            .from('quanlythuvien') // Tên bucket 
-            .upload(fileName, req.file.buffer, {
-                contentType: req.file.mimetype,
-            });
-
-        if (error) {
-            return res.status(400).send({ message: "Lỗi thật từ Supabase: " + error.message });
+        if (!req.file.buffer) {
+            return next(new ApiError(400, "[Lỗi Hệ Thống]: Bộ đệm file trống. Vui lòng kiểm tra lại upload.middleware.js."));
         }
 
-        const { data: publicUrlData } = supabase.storage
-            .from('quanlythuvien')
-            .getPublicUrl(fileName);
+        const fileName = generateSafeFileName(req.file.originalname);
+        
+        try {
+            const { error: uploadError } = await supabase.storage
+                .from('quanlythuvien')
+                .upload(fileName, req.file.buffer, {
+                    contentType: req.file.mimetype,
+                });
 
-        req.body.HinhAnh = publicUrlData.publicUrl;
-    } // <--- CHÚ Ý: Đóng ngoặc nhọn của if (req.file) ở đúng chỗ này!
+            if (uploadError) {
+                return next(new ApiError(400, `[Supabase Upload Error]: ${uploadError.message}`));
+            }
 
+            const { data: publicUrlData } = supabase.storage
+                .from('quanlythuvien')
+                .getPublicUrl(fileName);
+
+            req.body.HinhAnh = publicUrlData.publicUrl;
+
+        } catch (error) {
+            return next(new ApiError(500, `[Supabase System Error]: ${error.message}`));
+        }
+    }
+
+    // Cập nhật thông tin sách vào MongoDB
     try {
         const sachService = new SachService(MongoDB.client);
         const document = await sachService.update(req.params.id, req.body);
         if (!document) {
-            return next(new ApiError(404, "Không tìm thấy Sách"));
+            return next(new ApiError(404, `Không tìm thấy Sách với ID: ${req.params.id} để cập nhật.`));
         }
-        return res.send({ message: "Cập nhật Sách thành công" });
+        return res.send({ message: "Cập nhật thông tin Sách thành công!" });
     } catch (error) {
-        return next(new ApiError(500, `Lỗi cập nhật Sách có id=${req.params.id}`));
+        return next(new ApiError(500, "Hệ thống gặp sự cố khi cập nhật Cơ sở dữ liệu."));
     }
 };
 
@@ -126,10 +154,11 @@ exports.delete = async (req, res, next) => {
         const sachService = new SachService(MongoDB.client);
         const document = await sachService.delete(req.params.id);
         if (!document) {
-            return next(new ApiError(404, "Không tìm thấy Sách"));
+            return next(new ApiError(404, `Không tìm thấy Sách với ID: ${req.params.id} để xóa.`));
         }
-        return res.send({ message: "Xóa Sách thành công" });
+        return res.send({ message: "Xóa Sách khỏi hệ thống thành công!" });
     } catch (error) {
-        return next(new ApiError(400, error.message || `Không thể xóa Sách có id=${req.params.id}`));
+        // Bắt lỗi khi Sách đang có người mượn (Lỗi do service throw ra)
+        return next(new ApiError(400, error.message || "Không thể thực hiện lệnh xóa."));
     }
 };

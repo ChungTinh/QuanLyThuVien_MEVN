@@ -1,0 +1,54 @@
+/* --- TÔNG MÀU CHỦ ĐẠO (Xanh - Trắng) --- */
+:root {
+    --bg-color-main: #f4f6f9;
+    --bg-color-card: #ffffff;
+    --text-color-main: #212529;
+    --text-color-muted: #6c757d;
+
+    --primary-color: #6a5af9;
+    --border-color: #e9ecef;
+
+    --nav-bg: #ffffff;
+    --nav-text: #495057;
+
+    --footer-bg: #2d3138;
+}
+
+/* --- TÔNG MÀU TỐI (Xanh Đậm - Đen) --- */
+html[data-theme="dark"] {
+    --bg-color-main: #121212;
+    --bg-color-card: #1e1e1e;
+    --text-color-main: #e0e0e0;
+    --text-color-muted: #a0a0a0;
+
+    --primary-color: #8c82fa;
+    --border-color: #333333;
+
+    --nav-bg: #1c2331;
+    --nav-text: #e0e0e0;
+
+    --footer-bg: #11151c;
+}
+
+body {
+    background-color: var(--bg-color-main) !important;
+    color: var(--text-color-main) !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.card {
+    background-color: var(--bg-color-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+html[data-theme="dark"] .text-dark {
+    color: var(--text-color-main) !important;
+}
+
+html[data-theme="dark"] .text-muted {
+    color: var(--text-color-muted) !important;
+}
+
+html[data-theme="dark"] .bg-white {
+    background-color: var(--bg-color-card) !important;
+}
