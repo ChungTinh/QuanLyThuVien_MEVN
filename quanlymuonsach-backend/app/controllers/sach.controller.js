@@ -2,6 +2,11 @@ const SachService = require("../services/sach.service");
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
 
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+
 
 // Tạo và lưu 1 Sách mới
 exports.create = async (req, res, next) => {
@@ -10,8 +15,26 @@ exports.create = async (req, res, next) => {
     }
 
     if (req.file) {
-        req.body.HinhAnh = `/uploads/${req.file.filename}`;
+    // Tạo tên file độc nhất 
+    const fileName = Date.now() + "-" + req.file.originalname.replace(/\s+/g, '-');
+    
+    // push file lên mây Supabase
+    const { data, error } = await supabase.storage
+        .from('quanlythuvien') // Tên bucket 
+        .upload(fileName, req.file.buffer, {
+            contentType: req.file.mimetype,
+        });
+
+    if (error) {
+        throw new Error("Lỗi khi upload ảnh lên đám mây!");
     }
+
+    const { data: publicUrlData } = supabase.storage
+        .from('quanlythuvien')
+        .getPublicUrl(fileName);
+
+    req.body.HinhAnh = publicUrlData.publicUrl;
+}
     
     try {
         const sachService = new SachService(MongoDB.client);
@@ -63,8 +86,26 @@ exports.update = async (req, res, next) => {
     }
 
     if (req.file) {
-        req.body.HinhAnh = `/uploads/${req.file.filename}`;
+    // Tạo tên file độc nhất 
+    const fileName = Date.now() + "-" + req.file.originalname.replace(/\s+/g, '-');
+    
+    // push file lên mây Supabase
+    const { data, error } = await supabase.storage
+        .from('quanlythuvien') // Tên bucket 
+        .upload(fileName, req.file.buffer, {
+            contentType: req.file.mimetype,
+        });
+
+    if (error) {
+        throw new Error("Lỗi khi upload ảnh lên đám mây!");
     }
+
+    const { data: publicUrlData } = supabase.storage
+        .from('quanlythuvien')
+        .getPublicUrl(fileName);
+
+    req.body.HinhAnh = publicUrlData.publicUrl;
+}
 
     try {
         const sachService = new SachService(MongoDB.client);
