@@ -64,11 +64,7 @@
               <tr v-for="sach in sachs" :key="sach._id">
                 <td>
                   <img
-                    :src="
-                      sach.HinhAnh
-                        ? 'http://localhost:3000' + sach.HinhAnh
-                        : 'https://via.placeholder.com/50'
-                    "
+                    :src="sach.HinhAnh ? sach.HinhAnh : 'https://via.placeholder.com/250x350?text=Chưa+Có+Ảnh'"
                     class="rounded shadow-sm"
                     style="width: 50px; height: 70px; object-fit: cover"
                   />

@@ -58,11 +58,9 @@
             <img
               :src="
                 sach.HinhAnh
-                  ? 'http://localhost:3000' + sach.HinhAnh
+                  ? sach.HinhAnh
                   : 'https://via.placeholder.com/250x350?text=Chưa+Có+Ảnh'
               "
-              class="card-img-top custom-img"
-              alt="Ảnh bìa"
             />
             <span
               class="badge custom-badge position-absolute top-0 end-0 m-2 shadow-sm"
