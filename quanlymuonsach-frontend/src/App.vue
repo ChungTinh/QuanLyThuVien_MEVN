@@ -1,12 +1,22 @@
 <template>
   <div id="app" class="d-flex flex-column min-vh-100">
-    <AppHeader v-if="!isAdminRoute" />
+    <div
+      v-if="!isAdminRoute"
+      class="theme-container d-flex flex-column min-vh-100 w-100"
+      :data-theme="currentTheme"
+    >
+      <AppHeader :currentTheme="currentTheme" @toggleTheme="toggleTheme" />
+      <main class="flex-grow-1 d-flex flex-column">
+        <router-view />
+      </main>
+      <AppFooter />
+    </div>
 
-    <main class="flex-grow-1 d-flex">
-      <router-view />
-    </main>
-
-    <AppFooter v-if="!isAdminRoute" />
+    <div v-else class="d-flex flex-column min-vh-100 w-100">
+      <main class="flex-grow-1 d-flex flex-column">
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 
@@ -20,9 +30,26 @@ export default {
     AppHeader,
     AppFooter,
   },
+  data() {
+    return {
+      currentTheme: "light",
+    };
+  },
   computed: {
     isAdminRoute() {
       return this.$route.path.startsWith("/admin");
+    },
+  },
+  mounted() {
+    // Tải trạng thái theme khi khởi động
+    const savedTheme = localStorage.getItem("app-theme") || "light";
+    this.currentTheme = savedTheme;
+  },
+  methods: {
+    toggleTheme() {
+      // Đảo theme và lưu lại
+      this.currentTheme = this.currentTheme === "light" ? "dark" : "light";
+      localStorage.setItem("app-theme", this.currentTheme);
     },
   },
 };
@@ -32,6 +59,5 @@ export default {
 body {
   margin: 0;
   padding: 0;
-  background-color: #f4f6f9;
 }
 </style>

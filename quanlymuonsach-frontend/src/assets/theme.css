@@ -15,7 +15,7 @@
 }
 
 /* --- TÔNG MÀU TỐI (Xanh Đậm - Đen) --- */
-html[data-theme="dark"] {
+.theme-container[data-theme="dark"] {
     --bg-color-main: #121212;
     --bg-color-card: #1e1e1e;
     --text-color-main: #e0e0e0;
@@ -30,25 +30,36 @@ html[data-theme="dark"] {
     --footer-bg: #11151c;
 }
 
-body {
+/* --- ÁP DỤNG MÀU LÊN THẺ CƠ BẢN TRONG CONTAINER --- */
+.theme-container {
     background-color: var(--bg-color-main) !important;
     color: var(--text-color-main) !important;
+    min-height: 100vh;
+    /* Đảm bảo background bao phủ toàn màn hình */
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.card {
+.theme-container .card {
     background-color: var(--bg-color-card) !important;
     border-color: var(--border-color) !important;
 }
 
-html[data-theme="dark"] .text-dark {
+/* Ghi đè chữ màu text-dark, text-muted của Bootstrap khi ở chế độ tối */
+.theme-container[data-theme="dark"] .text-dark {
     color: var(--text-color-main) !important;
 }
 
-html[data-theme="dark"] .text-muted {
+.theme-container[data-theme="dark"] .text-muted {
     color: var(--text-color-muted) !important;
 }
 
-html[data-theme="dark"] .bg-white {
+.theme-container[data-theme="dark"] .bg-white {
     background-color: var(--bg-color-card) !important;
+}
+
+/* Fix màu gạch ngang trên mobile (nếu đang ở chế độ tối) */
+@media (max-width: 991px) {
+    .theme-container[data-theme="dark"] .border-bottom {
+        border-color: #333 !important;
+    }
 }

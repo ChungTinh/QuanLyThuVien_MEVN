@@ -143,30 +143,28 @@
 <script>
 export default {
   name: "AppHeader",
+  props: {
+    // Nhận trạng thái theme từ App.vue truyền xuống
+    currentTheme: {
+      type: String,
+      default: "light",
+    },
+  },
   data() {
     return {
-      currentTheme: "light",
-      isMenuOpen: false, // Cờ kiểm soát menu bằng Vue
+      isMenuOpen: false,
     };
-  },
-  mounted() {
-    const savedTheme = localStorage.getItem("app-theme") || "light";
-    this.currentTheme = savedTheme;
-    document.documentElement.setAttribute("data-theme", savedTheme);
   },
   methods: {
     toggleMenu() {
-      // Đảo ngược trạng thái mở/đóng menu khi bấm nút 3 gạch
       this.isMenuOpen = !this.isMenuOpen;
     },
     closeMenu() {
-      // Thu gọn menu khi click vào bất kỳ link nào
       this.isMenuOpen = false;
     },
     toggleTheme() {
-      this.currentTheme = this.currentTheme === "light" ? "dark" : "light";
-      document.documentElement.setAttribute("data-theme", this.currentTheme);
-      localStorage.setItem("app-theme", this.currentTheme);
+      // Phát tín hiệu lên component cha (App.vue) để xử lý đổi màu
+      this.$emit("toggleTheme");
     },
   },
 };
