@@ -101,16 +101,31 @@
                   />
                 </div>
               </div>
-              <div class="mb-3">
-                <label class="form-label fw-medium small text-secondary"
-                  >Số Điện Thoại</label
-                >
-                <input
-                  type="text"
-                  class="form-control custom-input"
-                  v-model="registerData.DienThoai"
-                  required
-                />
+              <div class="row g-2 mb-3">
+                <div class="col-7">
+                  <label class="form-label fw-medium small text-secondary"
+                    >Số Điện Thoại</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control custom-input"
+                    v-model="registerData.DienThoai"
+                    required
+                  />
+                </div>
+                <div class="col-5">
+                  <label class="form-label fw-medium small text-secondary"
+                    >Giới Tính</label
+                  >
+                  <select
+                    class="form-select custom-input"
+                    v-model="registerData.Phai"
+                    required
+                  >
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                  </select>
+                </div>
               </div>
               <div class="row g-2 mb-4">
                 <div class="col-6">

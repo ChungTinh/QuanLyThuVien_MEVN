@@ -174,16 +174,27 @@
                   />
                 </div>
               </div>
-              <div class="mb-4">
-                <label class="form-label fw-bold small text-secondary"
-                  >Điện Thoại</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  v-model="formData.DienThoai"
-                  required
-                />
+              <div class="row mb-4">
+                <div class="col-6">
+                  <label class="form-label fw-bold small text-secondary"
+                    >Điện Thoại</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    v-model="formData.DienThoai"
+                    required
+                  />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold small text-secondary"
+                    >Giới Tính</label
+                  >
+                  <select class="form-select" v-model="formData.Phai" required>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                  </select>
+                </div>
               </div>
               <div class="text-end">
                 <button
@@ -226,6 +237,7 @@ export default {
         HoLot: "",
         Ten: "",
         DienThoai: "",
+        Phai: "Nam",
       },
     };
   },
@@ -258,6 +270,7 @@ export default {
         HoLot: "",
         Ten: "",
         DienThoai: "",
+        Phai: "Nam",
       };
       this.modalInstance.show();
     },
