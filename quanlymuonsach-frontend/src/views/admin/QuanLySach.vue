@@ -64,7 +64,11 @@
               <tr v-for="sach in sachs" :key="sach._id">
                 <td>
                   <img
-                    :src="sach.HinhAnh ? sach.HinhAnh : 'https://via.placeholder.com/250x350?text=Chưa+Có+Ảnh'"
+                    :src="
+                      sach.HinhAnh
+                        ? sach.HinhAnh
+                        : 'https://via.placeholder.com/250x350?text=Chưa+Có+Ảnh'
+                    "
                     class="rounded shadow-sm"
                     style="width: 50px; height: 70px; object-fit: cover"
                   />
@@ -86,7 +90,7 @@
                   </span>
                 </td>
 
-                <!-- Cột Hành Động mới -->
+                <!-- Cột Hành Động -->
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
                     <button
@@ -197,17 +201,27 @@
                         required
                       />
                     </div>
+                    <!-- ĐÃ THAY ĐỔI: Chuyển input thành Thẻ Select Nhà Xuất Bản -->
                     <div class="col-6">
                       <label class="form-label fw-bold small text-secondary"
-                        >Mã NXB</label
+                        >Nhà Xuất Bản</label
                       >
-                      <input
-                        type="text"
-                        class="form-control"
+                      <select
+                        class="form-select"
                         v-model="formData.MaNXB"
-                        placeholder="VD: NXB01"
                         required
-                      />
+                      >
+                        <option value="" disabled selected>
+                          -- Chọn Nhà Xuất Bản --
+                        </option>
+                        <option
+                          v-for="nxb in nxbs"
+                          :key="nxb._id"
+                          :value="nxb.MaNXB"
+                        >
+                          {{ nxb.MaNXB }} - {{ nxb.TenNXB }}
+                        </option>
+                      </select>
                     </div>
                   </div>
                   <div class="row mb-3">
@@ -303,8 +317,8 @@
 </template>
 
 <script>
-// Giữ nguyên toàn bộ logic Script hiện tại của bạn
 import SachService from "@/services/sach.service";
+import NhaXuatBanService from "@/services/nhaxuatban.service";
 import * as bootstrap from "bootstrap";
 
 export default {
@@ -312,6 +326,7 @@ export default {
   data() {
     return {
       sachs: [],
+      nxbs: [],
       searchText: "",
       modalInstance: null,
       isEdit: false,
@@ -331,6 +346,7 @@ export default {
   },
   mounted() {
     this.layDanhSach();
+    this.layDanhSachNXB();
     this.modalInstance = new bootstrap.Modal(
       document.getElementById("sachModal"),
     );
@@ -342,6 +358,13 @@ export default {
         this.sachs = await SachService.getAll(params);
       } catch (error) {
         console.error(error);
+      }
+    },
+    async layDanhSachNXB() {
+      try {
+        this.nxbs = await NhaXuatBanService.getAll();
+      } catch (error) {
+        console.error("Lỗi lấy danh sách NXB:", error);
       }
     },
     async xoaSach(id, tenSach) {
@@ -397,9 +420,8 @@ export default {
         SoQuyen: sach.SoQuyen,
       };
       this.fileAnh = null;
-      this.previewImage = sach.HinhAnh
-        ? "http://localhost:3000" + sach.HinhAnh
-        : null;
+      this.previewImage = sach.HinhAnh ? sach.HinhAnh : null;
+
       this.modalInstance.show();
     },
     async luuSach() {
