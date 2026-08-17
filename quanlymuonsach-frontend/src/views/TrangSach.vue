@@ -56,6 +56,7 @@
         <div class="card h-100 shadow-sm border-0 custom-book-card rounded-4">
           <div class="card-img-wrapper position-relative">
             <img
+              class="custom-img"
               :src="
                 sach.HinhAnh
                   ? sach.HinhAnh
