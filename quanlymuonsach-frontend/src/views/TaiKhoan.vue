@@ -294,7 +294,7 @@
                   data-bs-target="#info"
                   type="button"
                 >
-                  Cập nhật thôngত্তি
+                  Cập nhật thông tin
                 </button>
               </li>
               <li class="nav-item" role="presentation">
