@@ -1,6 +1,5 @@
 <template>
   <div class="container mt-5 mb-5">
-    <!-- CHƯA ĐĂNG NHẬP -->
     <div v-if="!isLoggedIn" class="row justify-content-center">
       <div class="col-md-5 col-lg-4">
         <div class="card shadow-sm border-0 rounded-4 custom-card">
@@ -31,7 +30,6 @@
               {{ errorMessage }}
             </div>
 
-            <!-- Form Đăng Nhập -->
             <form v-if="!isRegistering" @submit.prevent="handleLogin">
               <div class="mb-3">
                 <label class="form-label fw-medium small text-secondary"
@@ -75,7 +73,6 @@
               </div>
             </form>
 
-            <!-- Form Đăng Ký -->
             <form v-else @submit.prevent="handleRegister">
               <div class="row g-2 mb-3">
                 <div class="col-6">
@@ -127,31 +124,19 @@
                   </select>
                 </div>
               </div>
-              <div class="row g-2 mb-4">
-                <div class="col-6">
-                  <label class="form-label fw-medium small text-secondary"
-                    >Mã Độc Giả</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control custom-input"
-                    v-model="registerData.MaDocGia"
-                    placeholder="VD: DG09"
-                    required
-                  />
-                </div>
-                <div class="col-6">
-                  <label class="form-label fw-medium small text-secondary"
-                    >Mật Khẩu</label
-                  >
-                  <input
-                    type="password"
-                    class="form-control custom-input"
-                    v-model="registerData.Password"
-                    required
-                  />
-                </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-medium small text-secondary"
+                  >Mật Khẩu</label
+                >
+                <input
+                  type="password"
+                  class="form-control custom-input"
+                  v-model="registerData.Password"
+                  required
+                />
               </div>
+
               <button
                 type="submit"
                 class="btn btn-success w-100 fw-bold rounded-pill shadow-sm"
@@ -174,9 +159,7 @@
       </div>
     </div>
 
-    <!-- ĐÃ ĐĂNG NHẬP -->
     <div v-else class="row justify-content-center">
-      <!-- Cột trái: Thông tin Card -->
       <div class="col-md-4 col-lg-3 mb-4">
         <div
           class="card shadow-sm border-0 rounded-4 text-center custom-card overflow-hidden"
@@ -204,7 +187,6 @@
         </div>
       </div>
 
-      <!-- Cột phải: Tabs nội dung -->
       <div class="col-md-8 col-lg-7">
         <div class="card shadow-sm border-0 rounded-4 custom-card">
           <div
@@ -247,7 +229,6 @@
 
           <div class="card-body p-4 p-md-5">
             <div class="tab-content">
-              <!-- TAB CẬP NHẬT THÔNG TIN -->
               <div class="tab-pane fade show active" id="info">
                 <form @submit.prevent="updateInfo">
                   <div class="row g-3 mb-3">
@@ -320,7 +301,6 @@
                 </form>
               </div>
 
-              <!-- TAB ĐỔI MẬT KHẨU -->
               <div class="tab-pane fade" id="password">
                 <form @submit.prevent="updatePassword" class="w-75 mx-auto">
                   <div class="mb-3">
@@ -356,7 +336,6 @@
                 </form>
               </div>
 
-              <!-- TAB LỊCH SỬ MƯỢN -->
               <div class="tab-pane fade" id="history">
                 <div v-if="loadingHistory" class="text-center py-4">
                   <span
@@ -445,7 +424,6 @@ export default {
         HoLot: "",
         Ten: "",
         DienThoai: "",
-        MaDocGia: "",
         Password: "",
         Phai: "Nam",
         DiaChi: "Chưa cập nhật",
@@ -540,10 +518,15 @@ export default {
       this.isLoading = true;
       this.errorMessage = "";
       try {
-        await DocGiaService.create(this.registerData);
-        alert("Đăng ký thành công! Vui lòng đăng nhập.");
+        const response = await DocGiaService.create(this.registerData);
+        const maMoiSinh = response.MaDocGia || response.data?.MaDocGia;
+
+        alert(
+          `Đăng ký thành công!\n\nMã Độc Giả của bạn là: ${maMoiSinh}\nVui lòng ghi nhớ mã này để đăng nhập.`,
+        );
+
         this.isRegistering = false;
-        this.loginData.MaDocGia = this.registerData.MaDocGia;
+        this.loginData.MaDocGia = maMoiSinh;
       } catch (error) {
         this.errorMessage =
           error.response?.data?.message || "Lỗi khi đăng ký tài khoản!";

@@ -5,19 +5,22 @@ const ApiError = require("../api-error");
 
 // Tạo và lưu 1 Độc giả mới
 exports.create = async (req, res, next) => {
-    const { MaDocGia, HoLot, Ten, Phai, DienThoai, Password } = req.body;
-    if (!MaDocGia || !HoLot || !Ten || !Phai || !DienThoai || !Password) {
-        return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc (Mã ĐG, Họ lót, Tên, Giới tính, SĐT, Mật khẩu)!"));
+    const { HoLot, Ten, Phai, DienThoai, Password } = req.body;
+    if (!HoLot || !Ten || !Phai || !DienThoai || !Password) {
+        return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc (Họ lót, Tên, Giới tính, SĐT, Mật khẩu)!"));
     }
+
+    // Tạo mã độc giả ngẫu nhiên
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    req.body.MaDocGia = "DG" + randomNum;
 
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
         const document = await docgiaService.create(req.body);
         return res.send(document);
     } catch (error) {
-        // Bắt lỗi trùng mã
         if (error.message.includes("đã tồn tại")) {
-            return next(new ApiError(400, error.message));
+            return next(new ApiError(400, "Hệ thống bận, vui lòng bấm đăng ký lại!")); 
         }
         return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Độc giả."));
     }

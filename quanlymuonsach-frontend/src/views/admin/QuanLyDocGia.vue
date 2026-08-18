@@ -38,7 +38,6 @@
       </button>
     </div>
 
-    <!-- Bảng danh sách độc giả -->
     <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -110,7 +109,6 @@
       </div>
     </div>
 
-    <!-- Modal Thêm Độc Giả -->
     <div class="modal fade" id="docGiaModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content border-0 rounded-4 shadow">
@@ -126,30 +124,18 @@
           </div>
           <div class="modal-body p-4">
             <form @submit.prevent="luuDocGia">
-              <div class="row mb-3">
-                <div class="col-6">
-                  <label class="form-label fw-bold small text-secondary"
-                    >Mã Độc Giả</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="formData.MaDocGia"
-                    required
-                  />
-                </div>
-                <div class="col-6">
-                  <label class="form-label fw-bold small text-secondary"
-                    >Mật khẩu cấp tạm</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="formData.Password"
-                    required
-                  />
-                </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-secondary"
+                  >Mật khẩu cấp tạm</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="formData.Password"
+                  required
+                />
               </div>
+
               <div class="row mb-3">
                 <div class="col-6">
                   <label class="form-label fw-bold small text-secondary"
@@ -231,7 +217,6 @@ export default {
       searchText: "",
       modalInstance: null,
       formData: {
-        MaDocGia: "",
         Password: "123",
         HoLot: "",
         Ten: "",
@@ -264,7 +249,6 @@ export default {
     },
     moFormThem() {
       this.formData = {
-        MaDocGia: "",
         Password: "123",
         HoLot: "",
         Ten: "",
@@ -292,16 +276,16 @@ export default {
     },
     async luuDocGia() {
       try {
-        await DocGiaService.create(this.formData);
-        alert("Đã tạo Độc giả thành công!");
+        const response = await DocGiaService.create(this.formData);
+        const maMoiSinh = response.MaDocGia || response.data?.MaDocGia;
+        alert(
+          `Đã tạo Độc giả thành công!\n\nMã Độc Giả vừa được cấp là: ${maMoiSinh}`,
+        );
+
         this.modalInstance.hide();
         this.layDanhSach();
       } catch (error) {
-        alert(
-          "Lỗi: " +
-            (error.response?.data?.message ||
-              "Trùng mã độc giả hoặc lỗi server!"),
-        );
+        alert("Lỗi: " + (error.response?.data?.message || "Lỗi server!"));
       }
     },
   },

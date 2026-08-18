@@ -2,7 +2,6 @@
   <div>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="fw-bold text-primary">👑 Quản Lý Nhân Sự</h3>
-      <!-- Nút thêm nhân viên -->
       <button
         @click="moFormThem"
         class="btn btn-primary text-white fw-bold shadow-sm rounded-pill px-4"
@@ -11,7 +10,6 @@
       </button>
     </div>
 
-    <!-- Bảng danh sách -->
     <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -23,7 +21,6 @@
                 <th class="py-3">Chức Vụ</th>
                 <th class="py-3">Điện Thoại</th>
                 <th class="py-3 text-start">Địa Chỉ</th>
-                <!-- Đã bổ sung cột Địa Chỉ -->
                 <th class="py-3">Hành Động</th>
               </tr>
             </thead>
@@ -52,7 +49,6 @@
                 </td>
                 <td class="text-muted">{{ nv.SoDienThoai }}</td>
                 <td class="text-start text-muted">{{ nv.DiaChi }}</td>
-                <!-- Hiển thị dữ liệu Địa Chỉ -->
                 <td>
                   <div class="d-flex justify-content-center">
                     <button
@@ -82,7 +78,6 @@
       </div>
     </div>
 
-    <!-- Modal Thêm Nhân Viên -->
     <div class="modal fade" id="nhanVienModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content border-0 rounded-4 shadow">
@@ -98,30 +93,18 @@
           </div>
           <div class="modal-body p-4">
             <form @submit.prevent="luuNhanVien">
-              <div class="row mb-3">
-                <div class="col-6">
-                  <label class="form-label fw-bold small text-secondary"
-                    >Mã Số (MSNV)</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="formData.MSNV"
-                    required
-                  />
-                </div>
-                <div class="col-6">
-                  <label class="form-label fw-bold small text-secondary"
-                    >Mật khẩu</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    v-model="formData.Password"
-                    required
-                  />
-                </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-secondary"
+                  >Mật khẩu</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="formData.Password"
+                  required
+                />
               </div>
+
               <div class="mb-3">
                 <label class="form-label fw-bold small text-secondary"
                   >Họ Tên</label
@@ -199,7 +182,6 @@ export default {
       nhanViens: [],
       modalInstance: null,
       formData: {
-        MSNV: "",
         Password: "123",
         HoTenNV: "",
         ChucVu: "Nhân Viên",
@@ -224,7 +206,6 @@ export default {
     },
     moFormThem() {
       this.formData = {
-        MSNV: "",
         Password: "123",
         HoTenNV: "",
         ChucVu: "Nhân Viên",
@@ -235,12 +216,19 @@ export default {
     },
     async luuNhanVien() {
       try {
-        await NhanVienService.create(this.formData);
-        alert("Đã thêm nhân sự thành công!");
+        const response = await NhanVienService.create(this.formData);
+        const maMoiSinh = response.MSNV || response.data?.MSNV;
+
+        alert(
+          `Đã thêm nhân sự thành công!\n\nMã Nhân Viên mới là: ${maMoiSinh}`,
+        );
+
         this.modalInstance.hide();
         this.layDanhSach();
       } catch (error) {
-        alert("Lỗi: " + (error.response?.data?.message || "Trùng MSNV!"));
+        alert(
+          "Lỗi: " + (error.response?.data?.message || "Lỗi tạo tài khoản!"),
+        );
       }
     },
     async xoaNhanVien(id, ten) {

@@ -5,18 +5,22 @@ const ApiError = require("../api-error");
 
 // Tạo và lưu 1 Nhân viên mới
 exports.create = async (req, res, next) => {
-    const { MSNV, HoTenNV, ChucVu, Password, SoDienThoai } = req.body;
-    if (!MSNV || !HoTenNV || !ChucVu || !Password || !SoDienThoai) {
-        return next(new ApiError(400, "Lỗi: Vui lòng nhập đầy đủ thông tin bắt buộc (MSNV, Họ Tên, Chức vụ, Mật khẩu, SĐT)!"));
+    const { HoTenNV, ChucVu, Password, SoDienThoai } = req.body;
+    if (!HoTenNV || !ChucVu || !Password || !SoDienThoai) {
+        return next(new ApiError(400, "Lỗi: Vui lòng nhập đầy đủ thông tin bắt buộc (Họ Tên, Chức vụ, Mật khẩu, SĐT)!"));
     }
-    
+
+    // Tạo mã nhân viên ngẫu nhiên
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    req.body.MSNV = "NV" + randomNum;
+
     try {
         const nhanvienService = new NhanVienService(MongoDB.client);
         const document = await nhanvienService.create(req.body);
         return res.send(document);
     } catch (error) {
         if (error.message.includes("đã tồn tại")) {
-            return next(new ApiError(400, error.message));
+            return next(new ApiError(400, "Hệ thống bận, vui lòng thử thêm lại!"));
         }
         return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Nhân viên"));
     }
