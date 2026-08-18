@@ -221,7 +221,6 @@ import TheoDoiMuonSachService from "@/services/theodoimuonsach.service";
 import DocGiaService from "@/services/docgia.service";
 import SachService from "@/services/sach.service";
 import * as bootstrap from "bootstrap";
-import Swal from "sweetalert2";
 
 export default {
   name: "MuonTra",
@@ -297,39 +296,20 @@ export default {
     },
 
     async xoaPhieu(id) {
-      // Gọi popup xác nhận xịn xò của SweetAlert2
-      const result = await Swal.fire({
-        title: "Xóa phiếu mượn?",
-        text: "Hành động này sẽ xóa vĩnh viễn phiếu mượn khỏi hệ thống!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#dc3545",
-        cancelButtonColor: "#6c757d",
-        confirmButtonText: "Đồng ý, xóa luôn!",
-        cancelButtonText: "Hủy thao tác",
-      });
-
-      if (result.isConfirmed) {
+      if (
+        confirm(
+          "Hành động này sẽ xóa vĩnh viễn phiếu mượn. Bạn có chắc chắn muốn xóa?",
+        )
+      ) {
         try {
-          // Gọi API xuống Backend để xóa
           await TheoDoiMuonSachService.delete(id);
-
-          // Thông báo thành công
-          Swal.fire({
-            title: "Đã xóa!",
-            text: "Phiếu mượn đã bị xóa thành công.",
-            icon: "success",
-            timer: 2000,
-            showConfirmButton: false,
-          });
-
-          // Load lại danh sách bảng
+          alert("Phiếu mượn đã bị xóa thành công.");
+          g;
           await this.loadTatCaDuLieu();
         } catch (error) {
-          // Hiện thông báo lỗi nếu có trục trặc
           const loiBackend =
             error.response?.data?.message || "Lỗi khi xóa phiếu mượn này!";
-          Swal.fire("LỖI", loiBackend, "error");
+          alert("LỖI: " + loiBackend);
         }
       }
     },
