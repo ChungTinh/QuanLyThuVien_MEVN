@@ -304,7 +304,6 @@ export default {
         try {
           await TheoDoiMuonSachService.delete(id);
           alert("Phiếu mượn đã bị xóa thành công.");
-          g;
           await this.loadTatCaDuLieu();
         } catch (error) {
           const loiBackend =
