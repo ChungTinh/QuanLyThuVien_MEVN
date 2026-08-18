@@ -25,14 +25,19 @@ class SachService {
     }
 
     // Thêm mới (Create)
+    // Thêm mới (Create)
     async create(payload) {
         const sach = this.extractSachData(payload);
-        const result = await this.Sach.findOneAndUpdate(
-            { MaSach: sach.MaSach },
-            { $set: sach },
-            { returnDocument: "after", upsert: true }
-        );
-        return result;
+        
+        // Kiểm tra xem MaSach đã tồn tại chưa
+        const tonTai = await this.Sach.findOne({ MaSach: sach.MaSach });
+        if (tonTai) {
+            throw new Error("Mã Sách này đã tồn tại trong kho!");
+        }
+
+        // Tạo mới nếu chưa tồn tại
+        const result = await this.Sach.insertOne(sach);
+        return await this.Sach.findOne({ _id: result.insertedId });
     }
 
     // Lấy danh sách (Read all)

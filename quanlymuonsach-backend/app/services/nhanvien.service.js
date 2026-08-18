@@ -24,12 +24,15 @@ class NhanVienService {
     // Thêm mới (Create)
     async create(payload) {
         const nhanvien = this.extractNhanVienData(payload);
-        const result = await this.NhanVien.findOneAndUpdate(
-            { MSNV: nhanvien.MSNV },
-            { $set: nhanvien },
-            { returnDocument: "after", upsert: true }
-        );
-        return result;
+        
+        // Kiểm tra xem MSNV đã tồn tại trong cơ sở dữ liệu hay chưa
+        const tonTai = await this.NhanVien.findOne({ MSNV: nhanvien.MSNV });
+        if (tonTai) {
+            throw new Error("Mã Nhân viên này đã tồn tại trong hệ thống!");
+        }
+
+        const result = await this.NhanVien.insertOne(nhanvien);
+        return await this.NhanVien.findOne({ _id: result.insertedId });
     }
 
     // Lấy danh sách (Read all)

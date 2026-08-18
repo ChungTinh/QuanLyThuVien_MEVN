@@ -163,7 +163,6 @@
                   type="text"
                   class="form-control"
                   v-model="formData.DiaChi"
-                  required
                 />
               </div>
               <div class="text-end">

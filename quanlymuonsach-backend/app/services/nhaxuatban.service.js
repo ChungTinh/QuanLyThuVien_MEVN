@@ -21,13 +21,14 @@ class NhaXuatBanService {
 
     // Thêm mới (Create)
     async create(payload) {
-        const nhaxuatban = this.extractNhaXuatBanData(payload);
-        const result = await this.NhaXuatBan.findOneAndUpdate(
-            { MaNXB: nhaxuatban.MaNXB },
-            { $set: nhaxuatban },
-            { returnDocument: "after", upsert: true }
-        );
-        return result;
+        const nhaxuatban = this.extractNhaXuatBanData(payload);      
+        
+        const tonTai = await this.NhaXuatBan.findOne({ MaNXB: nhaxuatban.MaNXB });
+        if (tonTai) {
+            throw new Error("Mã Nhà Xuất Bản này đã tồn tại!");
+        }
+        const result = await this.NhaXuatBan.insertOne(nhaxuatban);
+        return await this.NhaXuatBan.findOne({ _id: result.insertedId });
     }
 
     // Lấy danh sách (Read all)

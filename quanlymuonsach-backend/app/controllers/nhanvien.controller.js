@@ -5,14 +5,19 @@ const ApiError = require("../api-error");
 
 // Tạo và lưu 1 Nhân viên mới
 exports.create = async (req, res, next) => {
-    if (!req.body?.MSNV) {
-        return next(new ApiError(400, "Mã Nhân viên không được để trống"));
+    const { MSNV, HoTenNV, ChucVu, Password, SoDienThoai } = req.body;
+    if (!MSNV || !HoTenNV || !ChucVu || !Password || !SoDienThoai) {
+        return next(new ApiError(400, "Lỗi: Vui lòng nhập đầy đủ thông tin bắt buộc (MSNV, Họ Tên, Chức vụ, Mật khẩu, SĐT)!"));
     }
+    
     try {
         const nhanvienService = new NhanVienService(MongoDB.client);
         const document = await nhanvienService.create(req.body);
         return res.send(document);
     } catch (error) {
+        if (error.message.includes("đã tồn tại")) {
+            return next(new ApiError(400, error.message));
+        }
         return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Nhân viên"));
     }
 };

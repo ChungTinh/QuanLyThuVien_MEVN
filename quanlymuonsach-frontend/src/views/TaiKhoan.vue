@@ -307,7 +307,6 @@
                       type="text"
                       class="form-control custom-input"
                       v-model="editUser.DiaChi"
-                      required
                     />
                   </div>
                   <div class="text-end">

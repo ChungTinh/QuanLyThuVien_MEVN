@@ -17,8 +17,9 @@ const generateSafeFileName = (originalName) => {
 
 // Tạo và lưu 1 Sách mới
 exports.create = async (req, res, next) => {
-    if (!req.body?.MaSach) {
-        return next(new ApiError(400, "Mã Sách không được để trống!"));
+    const { MaSach, TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, TacGia } = req.body;
+    if (!MaSach || !TenSach || !DonGia || !SoQuyen || !NamXuatBan || !MaNXB || !TacGia) {
+        return next(new ApiError(400, "Lỗi: Thiếu thông tin bắt buộc (Mã, Tên, Giá, Số lượng, Năm XB, Mã NXB, Tác giả)!"));
     }
 
     // Xử lý upload ảnh 
@@ -61,6 +62,9 @@ exports.create = async (req, res, next) => {
         const document = await sachService.create(req.body);
         return res.send(document);
     } catch (error) {
+        if (error.message.includes("đã tồn tại")) {
+            return next(new ApiError(400, error.message));
+        }
         return next(new ApiError(500, "Hệ thống gặp sự cố khi lưu Sách vào Cơ sở dữ liệu."));
     }
 };

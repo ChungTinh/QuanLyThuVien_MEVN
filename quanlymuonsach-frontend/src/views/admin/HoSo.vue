@@ -98,7 +98,6 @@
                       type="text"
                       class="form-control"
                       v-model="editUser.DiaChi"
-                      required
                     />
                   </div>
                   <button type="submit" class="btn btn-success px-4 fw-bold">

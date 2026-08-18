@@ -5,16 +5,17 @@ const ApiError = require("../api-error");
 
 // Tạo và lưu 1 Độc giả mới
 exports.create = async (req, res, next) => {
-    if (!req.body?.MaDocGia) {
-        return next(new ApiError(400, "Mã Độc giả không được để trống"));
+    const { MaDocGia, HoLot, Ten, Phai, DienThoai, Password } = req.body;
+    if (!MaDocGia || !HoLot || !Ten || !Phai || !DienThoai || !Password) {
+        return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc (Mã ĐG, Họ lót, Tên, Giới tính, SĐT, Mật khẩu)!"));
     }
-    try {
-        const docgiaService = new DocGiaService(MongoDB.client);
-        const document = await docgiaService.create(req.body);
-        return res.send(document);
-    } catch (error) {
-        return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Độc giả"));
+    
+    catch (error) {
+    if (error.message.includes("đã tồn tại")) {
+        return next(new ApiError(400, error.message));
     }
+    return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Độc giả"));
+}
 };
 
 // Lấy danh sách tất cả Độc giả

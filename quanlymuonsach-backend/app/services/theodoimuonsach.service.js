@@ -21,6 +21,7 @@ class TheoDoiMuonSachService {
     }
 
     // Thêm mới (Create)
+    // Thêm mới (Create)
     async create(payload) {
         const theodoi = this.extractData(payload);
 
@@ -44,9 +45,9 @@ class TheoDoiMuonSachService {
             throw new Error("Sách này hiện đã được mượn hết, vui lòng quay lại sau!");
         }
 
-        // 5.  Ghi nhận lượt mượn nếu còn sách
+        // 5. Ghi nhận lượt mượn 
         const result = await this.TheoDoi.insertOne(theodoi);
-        return result;
+        return await this.TheoDoi.findOne({ _id: result.insertedId });
     }
 
     // Lấy danh sách (Read all)

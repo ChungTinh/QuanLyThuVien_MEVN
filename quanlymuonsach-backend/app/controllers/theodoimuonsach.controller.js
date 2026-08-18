@@ -5,8 +5,9 @@ const ApiError = require("../api-error");
 
 // Tạo và lưu 1 lượt mượn sách mới
 exports.create = async (req, res, next) => {
-    if (!req.body?.MaDocGia || !req.body?.MaSach) {
-        return next(new ApiError(400, "Mã Độc giả và Mã Sách không được để trống"));
+    const { MaDocGia, MaSach, NgayMuon } = req.body;
+    if (!MaDocGia || !MaSach || !NgayMuon) {
+        return next(new ApiError(400, "Lỗi: Vui lòng cung cấp đầy đủ Mã Độc Giả, Mã Sách và Ngày Mượn!"));
     }
     try {
         const theodoiService = new TheoDoiMuonSachService(MongoDB.client);

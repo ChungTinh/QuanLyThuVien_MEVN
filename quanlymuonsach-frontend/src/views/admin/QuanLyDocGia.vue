@@ -220,7 +220,6 @@
 </template>
 
 <script>
-// Giữ nguyên logic Script
 import DocGiaService from "@/services/docgia.service";
 import * as bootstrap from "bootstrap";
 
