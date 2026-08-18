@@ -216,8 +216,7 @@ export default {
         return;
       }
       try {
-        // GỌI HÀM MỚI UPDATEPASSWORD với OldPassword và NewPassword
-        await DocGiaService.updatePassword(this.currentUser._id, {
+        await NhanVienService.updatePassword(this.currentUser._id, {
           OldPassword: this.oldPassword,
           NewPassword: this.newPassword,
         });
