@@ -9,13 +9,18 @@ exports.create = async (req, res, next) => {
     if (!MaDocGia || !HoLot || !Ten || !Phai || !DienThoai || !Password) {
         return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc (Mã ĐG, Họ lót, Tên, Giới tính, SĐT, Mật khẩu)!"));
     }
-    
-    catch (error) {
-    if (error.message.includes("đã tồn tại")) {
-        return next(new ApiError(400, error.message));
+
+    try {
+        const docgiaService = new DocGiaService(MongoDB.client);
+        const document = await docgiaService.create(req.body);
+        return res.send(document);
+    } catch (error) {
+        // Bắt lỗi trùng mã
+        if (error.message.includes("đã tồn tại")) {
+            return next(new ApiError(400, error.message));
+        }
+        return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Độc giả."));
     }
-    return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Độc giả"));
-}
 };
 
 // Lấy danh sách tất cả Độc giả
