@@ -113,35 +113,76 @@
                     <label class="form-label text-secondary small fw-medium"
                       >Mật khẩu Cũ</label
                     >
-                    <input
-                      type="password"
-                      class="form-control custom-input"
-                      v-model="oldPassword"
-                      required
-                    />
+                    <div class="input-group">
+                      <input
+                        :type="showOldPwd ? 'text' : 'password'"
+                        class="form-control custom-input border-end-0"
+                        v-model="oldPassword"
+                        required
+                      />
+                      <button
+                        class="btn border border-start-0 custom-eye-btn"
+                        type="button"
+                        @click="showOldPwd = !showOldPwd"
+                      >
+                        <i
+                          :class="showOldPwd ? 'bi bi-eye' : 'bi bi-eye-slash'"
+                          class="text-muted"
+                        ></i>
+                      </button>
+                    </div>
                   </div>
+
                   <div class="mb-3">
                     <label class="form-label text-secondary small fw-medium"
                       >Mật khẩu Mới</label
                     >
-                    <input
-                      type="password"
-                      class="form-control custom-input"
-                      v-model="newPassword"
-                      required
-                    />
+                    <div class="input-group">
+                      <input
+                        :type="showNewPwd ? 'text' : 'password'"
+                        class="form-control custom-input border-end-0"
+                        v-model="newPassword"
+                        required
+                      />
+                      <button
+                        class="btn border border-start-0 custom-eye-btn"
+                        type="button"
+                        @click="showNewPwd = !showNewPwd"
+                      >
+                        <i
+                          :class="showNewPwd ? 'bi bi-eye' : 'bi bi-eye-slash'"
+                          class="text-muted"
+                        ></i>
+                      </button>
+                    </div>
                   </div>
+
                   <div class="mb-4">
                     <label class="form-label text-secondary small fw-medium"
                       >Xác nhận mật khẩu mới</label
                     >
-                    <input
-                      type="password"
-                      class="form-control custom-input"
-                      v-model="confirmPassword"
-                      required
-                    />
+                    <div class="input-group">
+                      <input
+                        :type="showConfirmPwd ? 'text' : 'password'"
+                        class="form-control custom-input border-end-0"
+                        v-model="confirmPassword"
+                        required
+                      />
+                      <button
+                        class="btn border border-start-0 custom-eye-btn"
+                        type="button"
+                        @click="showConfirmPwd = !showConfirmPwd"
+                      >
+                        <i
+                          :class="
+                            showConfirmPwd ? 'bi bi-eye' : 'bi bi-eye-slash'
+                          "
+                          class="text-muted"
+                        ></i>
+                      </button>
+                    </div>
                   </div>
+
                   <div class="text-center">
                     <button
                       type="submit"
@@ -172,6 +213,11 @@ export default {
       oldPassword: "",
       newPassword: "",
       confirmPassword: "",
+
+      // --- BIẾN ĐIỀU KHIỂN MẮT ---
+      showOldPwd: false,
+      showNewPwd: false,
+      showConfirmPwd: false,
     };
   },
   mounted() {
@@ -236,3 +282,26 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.custom-input {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  padding: 0.6rem 1rem;
+  transition: border-color 0.2s;
+}
+.custom-input:focus {
+  border-color: #6a5af9;
+  box-shadow: 0 0 0 0.25rem rgba(106, 90, 249, 0.15);
+}
+
+/* CSS CHO NÚT CON MẮT */
+.custom-eye-btn {
+  border-color: #dee2e6;
+  border-radius: 0 8px 8px 0;
+  background-color: transparent;
+}
+.custom-eye-btn i {
+  font-size: 1.1rem;
+}
+</style>

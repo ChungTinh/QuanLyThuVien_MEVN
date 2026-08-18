@@ -1,5 +1,6 @@
 <template>
   <div class="container mt-5 mb-5">
+    <!-- CHƯA ĐĂNG NHẬP -->
     <div v-if="!isLoggedIn" class="row justify-content-center">
       <div class="col-md-5 col-lg-4">
         <div class="card shadow-sm border-0 rounded-4 custom-card">
@@ -30,6 +31,7 @@
               {{ errorMessage }}
             </div>
 
+            <!-- Form Đăng Nhập -->
             <form v-if="!isRegistering" @submit.prevent="handleLogin">
               <div class="mb-3">
                 <label class="form-label fw-medium small text-secondary"
@@ -43,18 +45,33 @@
                   required
                 />
               </div>
+
+              <!-- HIỆN MẬT KHẨU CHO FORM ĐĂNG NHẬP -->
               <div class="mb-4">
                 <label class="form-label fw-medium small text-secondary"
                   >Mật khẩu</label
                 >
-                <input
-                  type="password"
-                  class="form-control custom-input"
-                  v-model="loginData.Password"
-                  placeholder="••••••••"
-                  required
-                />
+                <div class="input-group">
+                  <input
+                    :type="showPwd1 ? 'text' : 'password'"
+                    class="form-control custom-input border-end-0"
+                    v-model="loginData.Password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    class="btn border border-start-0 custom-eye-btn"
+                    type="button"
+                    @click="showPwd1 = !showPwd1"
+                  >
+                    <i
+                      :class="showPwd1 ? 'bi bi-eye' : 'bi bi-eye-slash'"
+                      class="text-muted"
+                    ></i>
+                  </button>
+                </div>
               </div>
+
               <button
                 type="submit"
                 class="btn theme-btn w-100 fw-bold rounded-pill"
@@ -73,6 +90,7 @@
               </div>
             </form>
 
+            <!-- Form Đăng Ký -->
             <form v-else @submit.prevent="handleRegister">
               <div class="row g-2 mb-3">
                 <div class="col-6">
@@ -125,16 +143,29 @@
                 </div>
               </div>
 
+              <!-- HIỆN MẬT KHẨU CHO FORM ĐĂNG KÝ -->
               <div class="mb-4">
                 <label class="form-label fw-medium small text-secondary"
                   >Mật Khẩu</label
                 >
-                <input
-                  type="password"
-                  class="form-control custom-input"
-                  v-model="registerData.Password"
-                  required
-                />
+                <div class="input-group">
+                  <input
+                    :type="showPwd1 ? 'text' : 'password'"
+                    class="form-control custom-input border-end-0"
+                    v-model="registerData.Password"
+                    required
+                  />
+                  <button
+                    class="btn border border-start-0 custom-eye-btn"
+                    type="button"
+                    @click="showPwd1 = !showPwd1"
+                  >
+                    <i
+                      :class="showPwd1 ? 'bi bi-eye' : 'bi bi-eye-slash'"
+                      class="text-muted"
+                    ></i>
+                  </button>
+                </div>
               </div>
 
               <button
@@ -159,6 +190,7 @@
       </div>
     </div>
 
+    <!-- ĐÃ ĐĂNG NHẬP -->
     <div v-else class="row justify-content-center">
       <div class="col-md-4 col-lg-3 mb-4">
         <div
@@ -308,35 +340,76 @@
                     <label class="form-label text-secondary small fw-medium"
                       >Mật khẩu Cũ</label
                     >
-                    <input
-                      type="password"
-                      class="form-control custom-input"
-                      v-model="oldPassword"
-                      required
-                    />
+                    <div class="input-group">
+                      <input
+                        :type="showOldPwd ? 'text' : 'password'"
+                        class="form-control custom-input border-end-0"
+                        v-model="oldPassword"
+                        required
+                      />
+                      <button
+                        class="btn border border-start-0 custom-eye-btn"
+                        type="button"
+                        @click="showOldPwd = !showOldPwd"
+                      >
+                        <i
+                          :class="showOldPwd ? 'bi bi-eye' : 'bi bi-eye-slash'"
+                          class="text-muted"
+                        ></i>
+                      </button>
+                    </div>
                   </div>
+
                   <div class="mb-3">
                     <label class="form-label text-secondary small fw-medium"
                       >Mật khẩu Mới</label
                     >
-                    <input
-                      type="password"
-                      class="form-control custom-input"
-                      v-model="newPassword"
-                      required
-                    />
+                    <div class="input-group">
+                      <input
+                        :type="showNewPwd ? 'text' : 'password'"
+                        class="form-control custom-input border-end-0"
+                        v-model="newPassword"
+                        required
+                      />
+                      <button
+                        class="btn border border-start-0 custom-eye-btn"
+                        type="button"
+                        @click="showNewPwd = !showNewPwd"
+                      >
+                        <i
+                          :class="showNewPwd ? 'bi bi-eye' : 'bi bi-eye-slash'"
+                          class="text-muted"
+                        ></i>
+                      </button>
+                    </div>
                   </div>
+
                   <div class="mb-4">
                     <label class="form-label text-secondary small fw-medium"
                       >Xác nhận mật khẩu mới</label
                     >
-                    <input
-                      type="password"
-                      class="form-control custom-input"
-                      v-model="confirmPassword"
-                      required
-                    />
+                    <div class="input-group">
+                      <input
+                        :type="showConfirmPwd ? 'text' : 'password'"
+                        class="form-control custom-input border-end-0"
+                        v-model="confirmPassword"
+                        required
+                      />
+                      <button
+                        class="btn border border-start-0 custom-eye-btn"
+                        type="button"
+                        @click="showConfirmPwd = !showConfirmPwd"
+                      >
+                        <i
+                          :class="
+                            showConfirmPwd ? 'bi bi-eye' : 'bi bi-eye-slash'
+                          "
+                          class="text-muted"
+                        ></i>
+                      </button>
+                    </div>
                   </div>
+
                   <div class="text-center">
                     <button
                       type="submit"
@@ -430,6 +503,12 @@ export default {
       errorMessage: "",
       isLoading: false,
 
+      // --- CÁC BIẾN ĐIỀU KHIỂN HIỂN THỊ MẬT KHẨU ---
+      showPwd1: false,
+      showOldPwd: false,
+      showNewPwd: false,
+      showConfirmPwd: false,
+
       lichSu: [],
       loadingHistory: false,
 
@@ -496,7 +575,6 @@ export default {
         return;
       }
       try {
-        // GỌI HÀM MỚI UPDATEPASSWORD với OldPassword và NewPassword
         await DocGiaService.updatePassword(this.currentUser._id, {
           OldPassword: this.oldPassword,
           NewPassword: this.newPassword,
@@ -592,6 +670,16 @@ export default {
 .custom-input:focus {
   border-color: #6a5af9;
   box-shadow: 0 0 0 0.25rem rgba(106, 90, 249, 0.15);
+}
+
+/* CSS CHO NÚT CON MẮT */
+.custom-eye-btn {
+  border-color: #dee2e6;
+  border-radius: 0 8px 8px 0;
+  background-color: transparent;
+}
+.custom-eye-btn i {
+  font-size: 1.1rem;
 }
 
 .custom-tabs {
