@@ -108,28 +108,48 @@
 
               <!-- TAB ĐỔI MẬT KHẨU -->
               <div class="tab-pane fade" id="password">
-                <form @submit.prevent="updatePassword">
+                <form @submit.prevent="updatePassword" class="w-75 mx-auto">
                   <div class="mb-3">
-                    <label class="form-label">Mật khẩu mới</label>
+                    <label class="form-label text-secondary small fw-medium"
+                      >Mật khẩu Cũ</label
+                    >
                     <input
                       type="password"
-                      class="form-control"
+                      class="form-control custom-input"
+                      v-model="oldPassword"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-secondary small fw-medium"
+                      >Mật khẩu Mới</label
+                    >
+                    <input
+                      type="password"
+                      class="form-control custom-input"
                       v-model="newPassword"
                       required
                     />
                   </div>
                   <div class="mb-4">
-                    <label class="form-label">Xác nhận mật khẩu mới</label>
+                    <label class="form-label text-secondary small fw-medium"
+                      >Xác nhận mật khẩu mới</label
+                    >
                     <input
                       type="password"
-                      class="form-control"
+                      class="form-control custom-input"
                       v-model="confirmPassword"
                       required
                     />
                   </div>
-                  <button type="submit" class="btn btn-warning px-4 fw-bold">
-                    Đổi Mật Khẩu
-                  </button>
+                  <div class="text-center">
+                    <button
+                      type="submit"
+                      class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm"
+                    >
+                      Đổi Mật Khẩu
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>
@@ -149,6 +169,7 @@ export default {
     return {
       currentUser: {},
       editUser: {},
+      oldPassword: "",
       newPassword: "",
       confirmPassword: "",
     };
@@ -183,7 +204,6 @@ export default {
 
         alert("Cập nhật thông tin thành công!");
 
-        // Load lại trang để cập nhật tên mới trên thẻ Sidebar góc trái
         window.location.reload();
       } catch (error) {
         alert("Lỗi khi cập nhật thông tin!");
@@ -196,16 +216,22 @@ export default {
         return;
       }
       try {
-        await NhanVienService.update(this.currentUser._id, {
-          Password: this.newPassword,
+        // GỌI HÀM MỚI UPDATEPASSWORD với OldPassword và NewPassword
+        await DocGiaService.updatePassword(this.currentUser._id, {
+          OldPassword: this.oldPassword,
+          NewPassword: this.newPassword,
         });
+
         alert(
-          "Đổi mật khẩu thành công! Vui lòng dùng mật khẩu này cho lần đăng nhập tới.",
+          "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.",
         );
+        this.oldPassword = "";
         this.newPassword = "";
         this.confirmPassword = "";
       } catch (error) {
-        alert("Lỗi khi đổi mật khẩu!");
+        alert(
+          "Lỗi: " + (error.response?.data?.message || "Lỗi khi đổi mật khẩu!"),
+        );
       }
     },
   },

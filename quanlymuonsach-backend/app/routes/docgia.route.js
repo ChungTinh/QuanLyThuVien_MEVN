@@ -15,4 +15,7 @@ router.route("/:id")
     .put(docgia.update)
     .delete(docgia.delete);
 
+router.route("/:id/password")
+    .put(docgia.updatePassword);
+
 module.exports = router;

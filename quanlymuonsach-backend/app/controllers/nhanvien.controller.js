@@ -55,10 +55,13 @@ exports.findOne = async (req, res, next) => {
 };
 
 
-// Cập nhật Nhân viên
+// Cập nhật thông tin Nhân viên
 exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Dữ liệu cập nhật không được rỗng"));
+    }
+    if (req.body.Password) {
+        delete req.body.Password;
     }
     try {
         const nhanvienService = new NhanVienService(MongoDB.client);
@@ -108,5 +111,33 @@ exports.login = async (req, res, next) => {
         }
     } catch (error) {
         return next(new ApiError(500, "Đã xảy ra lỗi khi đăng nhập"));
+    }
+};
+
+// Đổi mật khẩu nhân viên
+exports.updatePassword = async (req, res, next) => {
+    const { OldPassword, NewPassword } = req.body;
+    
+    if (!OldPassword || !NewPassword) {
+        return next(new ApiError(400, "Vui lòng cung cấp cả mật khẩu cũ và mới!"));
+    }
+
+    try {
+        const nhanvienService = new NhanVienService(MongoDB.client);
+        
+        const nhanvien = await nhanvienService.findById(req.params.id);
+        if (!nhanvien) {
+            return next(new ApiError(404, "Không tìm thấy tài khoản."));
+        }
+
+        if (nhanvien.Password !== OldPassword) {
+            return next(new ApiError(401, "Mật khẩu cũ không chính xác!"));
+        }
+
+        await nhanvienService.update(req.params.id, { Password: NewPassword });
+        return res.send({ message: "Đổi mật khẩu thành công!" });
+
+    } catch (error) {
+        return next(new ApiError(500, "Đã xảy ra lỗi khi đổi mật khẩu."));
     }
 };

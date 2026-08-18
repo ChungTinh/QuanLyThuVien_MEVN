@@ -301,11 +301,23 @@
                 </form>
               </div>
 
+              <!-- TAB ĐỔI MẬT KHẨU -->
               <div class="tab-pane fade" id="password">
                 <form @submit.prevent="updatePassword" class="w-75 mx-auto">
                   <div class="mb-3">
                     <label class="form-label text-secondary small fw-medium"
-                      >Mật khẩu mới</label
+                      >Mật khẩu Cũ</label
+                    >
+                    <input
+                      type="password"
+                      class="form-control custom-input"
+                      v-model="oldPassword"
+                      required
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label text-secondary small fw-medium"
+                      >Mật khẩu Mới</label
                     >
                     <input
                       type="password"
@@ -336,6 +348,7 @@
                 </form>
               </div>
 
+              <!-- TAB LỊCH SỬ MƯỢN SÁCH -->
               <div class="tab-pane fade" id="history">
                 <div v-if="loadingHistory" class="text-center py-4">
                   <span
@@ -411,6 +424,7 @@ export default {
       currentUser: null,
       editUser: {},
       loginData: { MaDocGia: "", Password: "" },
+      oldPassword: "",
       newPassword: "",
       confirmPassword: "",
       errorMessage: "",
@@ -475,22 +489,29 @@ export default {
         alert("Lỗi khi cập nhật thông tin!");
       }
     },
+
     async updatePassword() {
       if (this.newPassword !== this.confirmPassword) {
         alert("Mật khẩu xác nhận không khớp!");
         return;
       }
       try {
-        await DocGiaService.update(this.currentUser._id, {
-          Password: this.newPassword,
+        // GỌI HÀM MỚI UPDATEPASSWORD với OldPassword và NewPassword
+        await DocGiaService.updatePassword(this.currentUser._id, {
+          OldPassword: this.oldPassword,
+          NewPassword: this.newPassword,
         });
+
         alert(
           "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.",
         );
+        this.oldPassword = "";
         this.newPassword = "";
         this.confirmPassword = "";
       } catch (error) {
-        alert("Lỗi khi đổi mật khẩu!");
+        alert(
+          "Lỗi: " + (error.response?.data?.message || "Lỗi khi đổi mật khẩu!"),
+        );
       }
     },
     async loadLichSu() {

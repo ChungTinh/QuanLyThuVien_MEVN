@@ -60,7 +60,7 @@ exports.findOne = async (req, res, next) => {
     }
 };
 
-// Cập nhật Độc giả
+// Cập nhật thông tin Độc giả
 exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Dữ liệu cập nhật không được rỗng"));
@@ -111,5 +111,36 @@ exports.login = async (req, res, next) => {
         }
     } catch (error) {
         return next(new ApiError(500, "Đã xảy ra lỗi khi đăng nhập"));
+    }
+};
+
+
+// Đổi mật khẩu Độc giả
+exports.updatePassword = async (req, res, next) => {
+    const { OldPassword, NewPassword } = req.body;
+    
+    if (!OldPassword || !NewPassword) {
+        return next(new ApiError(400, "Vui lòng cung cấp cả mật khẩu cũ và mới!"));
+    }
+
+    try {
+        const docgiaService = new DocGiaService(MongoDB.client);
+        
+        const docgia = await docgiaService.findById(req.params.id);
+        if (!docgia) {
+            return next(new ApiError(404, "Không tìm thấy tài khoản."));
+        }
+
+        // Kiểm tra mật khẩu cũ (OldPassword) có khớp với mật khẩu hiện tại không
+        if (docgia.Password !== OldPassword) {
+            return next(new ApiError(401, "Mật khẩu cũ không chính xác!"));
+        }
+
+        // Cập nhật mật khẩu mới
+        await docgiaService.update(req.params.id, { Password: NewPassword });
+        return res.send({ message: "Đổi mật khẩu thành công!" });
+
+    } catch (error) {
+        return next(new ApiError(500, "Đã xảy ra lỗi khi đổi mật khẩu."));
     }
 };
