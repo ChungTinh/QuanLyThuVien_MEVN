@@ -132,18 +132,6 @@
             <form @submit.prevent="luuNXB">
               <div class="mb-3">
                 <label class="form-label fw-bold small text-secondary"
-                  >Mã NXB</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  v-model="formData.MaNXB"
-                  :disabled="isEdit"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label class="form-label fw-bold small text-secondary"
                   >Tên Nhà Xuất Bản</label
                 >
                 <input
@@ -188,9 +176,9 @@
 </template>
 
 <script>
-// Giữ nguyên logic Script
 import NhaXuatBanService from "@/services/nhaxuatban.service";
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 export default {
   name: "QuanLyNXB",
@@ -201,7 +189,7 @@ export default {
       isEdit: false,
       editId: null,
       searchText: "",
-      formData: { MaNXB: "", TenNXB: "", DiaChi: "" },
+      formData: { TenNXB: "", DiaChi: "" },
     };
   },
   mounted() {
@@ -228,14 +216,13 @@ export default {
     },
     moFormThem() {
       this.isEdit = false;
-      this.formData = { MaNXB: "", TenNXB: "", DiaChi: "" };
+      this.formData = { TenNXB: "", DiaChi: "" };
       this.modalInstance.show();
     },
     moFormSua(nxb) {
       this.isEdit = true;
       this.editId = nxb._id;
       this.formData = {
-        MaNXB: nxb.MaNXB,
         TenNXB: nxb.TenNXB,
         DiaChi: nxb.DiaChi,
       };
@@ -243,23 +230,61 @@ export default {
     },
     async luuNXB() {
       try {
-        if (this.isEdit)
+        if (this.isEdit) {
           await NhaXuatBanService.update(this.editId, this.formData);
-        else await NhaXuatBanService.create(this.formData);
+          Swal.fire(
+            "Thành công!",
+            "Cập nhật Nhà xuất bản thành công!",
+            "success",
+          );
+        } else {
+          const response = await NhaXuatBanService.create(this.formData);
+          const maMoiSinh = response.MaNXB || response.data?.MaNXB;
+          Swal.fire(
+            "Thành công!",
+            `Thêm Nhà xuất bản thành công!\nMã NXB mới: ${maMoiSinh}`,
+            "success",
+          );
+        }
         this.modalInstance.hide();
         this.layDanhSach();
-        alert("Lưu thành công!");
       } catch (error) {
-        alert("Lỗi: " + error.response?.data?.message);
+        Swal.fire(
+          "LỖI",
+          error.response?.data?.message || "Lỗi khi lưu NXB",
+          "error",
+        );
       }
     },
     async xoaNXB(id, ten) {
-      if (confirm(`Xóa NXB "${ten}"?`)) {
+      const result = await Swal.fire({
+        title: "Xác nhận xóa?",
+        text: `Bạn có chắc chắn muốn xóa NXB "${ten}"?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Xóa ngay!",
+        cancelButtonText: "Hủy",
+      });
+
+      if (result.isConfirmed) {
         try {
           await NhaXuatBanService.delete(id);
+          Swal.fire({
+            title: "Đã xóa!",
+            text: "Xóa NXB thành công.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
           this.layDanhSach();
         } catch (error) {
-          alert("Lỗi: " + error.response?.data?.message);
+          Swal.fire(
+            "LỖI",
+            error.response?.data?.message || "Không thể xóa NXB!",
+            "error",
+          );
         }
       }
     },

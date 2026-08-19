@@ -17,10 +17,13 @@ const generateSafeFileName = (originalName) => {
 
 // Tạo và lưu 1 Sách mới
 exports.create = async (req, res, next) => {
-    const { MaSach, TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, TacGia } = req.body;
-    if (!MaSach || !TenSach || !DonGia || !SoQuyen || !NamXuatBan || !MaNXB || !TacGia) {
-        return next(new ApiError(400, "Lỗi: Thiếu thông tin bắt buộc (Mã, Tên, Giá, Số lượng, Năm XB, Mã NXB, Tác giả)!"));
+    const { TenSach, DonGia, SoQuyen, NamXuatBan, MaNXB, TacGia } = req.body;
+    if (!TenSach || !DonGia || !SoQuyen || !NamXuatBan || !MaNXB || !TacGia) {
+        return next(new ApiError(400, "Lỗi: Thiếu thông tin bắt buộc (Tên sách, Giá, Số lượng, Năm XB, Mã NXB, Tác giả)!"));
     }
+
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    req.body.MaSach = "S" + randomNum;
 
     // Xử lý upload ảnh 
     if (req.file) {

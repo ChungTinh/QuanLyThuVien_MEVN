@@ -5,19 +5,23 @@ const ApiError = require("../api-error");
 
 // Tạo và lưu 1 NXB mới
 exports.create = async (req, res, next) => {
-    const { MaNXB, TenNXB } = req.body;
-    if (!MaNXB || !TenNXB || !DiaChi) {
-        return next(new ApiError(400, "Lỗi: Mã NXB và Tên NXB không được để trống!"));
+    const { TenNXB, DiaChi } = req.body;
+    if (!TenNXB || !DiaChi) {
+        return next(new ApiError(400, "Lỗi: Vui lòng nhập Tên NXB và Địa chỉ!"));
     }
+
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    req.body.MaNXB = "NXB" + randomNum;
+
     try {
         const nhaxuatbanService = new NhaXuatBanService(MongoDB.client);
         const document = await nhaxuatbanService.create(req.body);
         return res.send(document);
     } catch (error) {
         if (error.message.includes("đã tồn tại")) {
-            return next(new ApiError(400, error.message));
+            return next(new ApiError(400, "Hệ thống bận, vui lòng thử lại!"));
         }
-        return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Nhà Xuất Bản"));
+        return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Nhà Xuất Bản."));
     }
 };
 

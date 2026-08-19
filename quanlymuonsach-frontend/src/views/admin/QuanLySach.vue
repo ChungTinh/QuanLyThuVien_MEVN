@@ -162,19 +162,7 @@
                 <!-- Cột trái: Thông tin Text -->
                 <div class="col-md-8">
                   <div class="row mb-3">
-                    <div class="col-6">
-                      <label class="form-label fw-bold small text-secondary"
-                        >Mã Sách</label
-                      >
-                      <input
-                        type="text"
-                        class="form-control"
-                        v-model="formData.MaSach"
-                        :disabled="isEdit"
-                        required
-                      />
-                    </div>
-                    <div class="col-6">
+                    <div class="col-12">
                       <label class="form-label fw-bold small text-secondary"
                         >Tên Sách</label
                       >
@@ -198,7 +186,6 @@
                         required
                       />
                     </div>
-                    <!-- ĐÃ THAY ĐỔI: Chuyển input thành Thẻ Select Nhà Xuất Bản -->
                     <div class="col-6">
                       <label class="form-label fw-bold small text-secondary"
                         >Nhà Xuất Bản</label
@@ -330,7 +317,6 @@ export default {
       isEdit: false,
       editId: null,
       formData: {
-        MaSach: "",
         TenSach: "",
         TacGia: "",
         MaNXB: "",
@@ -421,7 +407,6 @@ export default {
       this.isEdit = false;
       this.editId = null;
       this.formData = {
-        MaSach: "",
         TenSach: "",
         TacGia: "",
         MaNXB: "",
@@ -438,7 +423,6 @@ export default {
       this.isEdit = true;
       this.editId = sach._id;
       this.formData = {
-        MaSach: sach.MaSach,
         TenSach: sach.TenSach,
         TacGia: sach.TacGia,
         MaNXB: sach.MaNXB,
@@ -455,7 +439,6 @@ export default {
     async luuSach() {
       try {
         const data = new FormData();
-        data.append("MaSach", this.formData.MaSach);
         data.append("TenSach", this.formData.TenSach);
         data.append("TacGia", this.formData.TacGia);
         data.append("MaNXB", this.formData.MaNXB);
@@ -468,8 +451,13 @@ export default {
           await SachService.update(this.editId, data);
           Swal.fire("Thành công!", "Cập nhật sách thành công!", "success");
         } else {
-          await SachService.create(data);
-          Swal.fire("Thành công!", "Thêm sách mới thành công!", "success");
+          const response = await SachService.create(data);
+          const maMoiSinh = response.MaSach || response.data?.MaSach;
+          Swal.fire(
+            "Thành công!",
+            `Thêm sách mới thành công!\nMã Sách mới: ${maMoiSinh}`,
+            "success",
+          );
         }
         this.modalInstance.hide();
         this.layDanhSach();
