@@ -177,6 +177,7 @@
                   type="date"
                   class="form-control custom-input"
                   v-model="registerData.NgaySinh"
+                  :max="homNay"
                   required
                 />
               </div>
@@ -681,6 +682,8 @@ export default {
       confirmPassword: "",
       errorMessage: "",
       isLoading: false,
+
+      homNay: new Date().toISOString().split("T")[0],
 
       showPwd1: false,
       showOldPwd: false,

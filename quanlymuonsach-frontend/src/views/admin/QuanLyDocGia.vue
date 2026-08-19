@@ -145,6 +145,7 @@
                   type="date"
                   class="form-control"
                   v-model="formData.NgaySinh"
+                  :max="homNay"
                   required
                 />
               </div>
@@ -241,6 +242,7 @@ export default {
         NgaySinh: "",
         DienThoai: "",
         Phai: "Nam",
+        homNay: new Date().toISOString().split("T")[0],
       },
     };
   },

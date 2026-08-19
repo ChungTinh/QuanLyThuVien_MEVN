@@ -11,6 +11,10 @@ exports.create = async (req, res, next) => {
         return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc!"));
     }
 
+    if (new Date(NgaySinh) > new Date()) {
+        return next(new ApiError(400, "Lỗi: Ngày sinh không thể ở tương lai!"));
+    }
+
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
         const dsSDT = await docgiaService.find({ DienThoai: DienThoai });
@@ -75,6 +79,10 @@ exports.update = async (req, res, next) => {
         return next(new ApiError(400, "Lỗi: Ngày sinh không được phép để trống!"));
     }
 
+    if (req.body.NgaySinh && new Date(req.body.NgaySinh) > new Date()) {
+        return next(new ApiError(400, "Lỗi: Ngày sinh cập nhật không thể ở tương lai!"));
+    }
+    
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
         if (req.body.DienThoai) {
