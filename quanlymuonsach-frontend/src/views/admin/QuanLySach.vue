@@ -3,7 +3,6 @@
     <!-- Tiêu đề & Khung tìm kiếm -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="fw-bold text-primary">📚 Quản Lý Sách</h3>
-
       <div
         class="input-group w-50 shadow-sm rounded-pill overflow-hidden border border-primary"
       >
@@ -30,7 +29,6 @@
           🔍 Tìm
         </button>
       </div>
-
       <button
         @click="moFormThem"
         class="btn btn-primary text-white fw-bold shadow-sm rounded-pill px-4"
@@ -89,7 +87,6 @@
                     {{ sach.SoQuyen }} cuốn
                   </span>
                 </td>
-
                 <!-- Cột Hành Động -->
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
@@ -320,6 +317,7 @@
 import SachService from "@/services/sach.service";
 import NhaXuatBanService from "@/services/nhaxuatban.service";
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 export default {
   name: "QuanLySach",
@@ -360,6 +358,7 @@ export default {
         console.error(error);
       }
     },
+
     async layDanhSachNXB() {
       try {
         this.nxbs = await NhaXuatBanService.getAll();
@@ -367,23 +366,49 @@ export default {
         console.error("Lỗi lấy danh sách NXB:", error);
       }
     },
+
     async xoaSach(id, tenSach) {
-      if (confirm(`Xóa sách "${tenSach}"?`)) {
+      const result = await Swal.fire({
+        title: "Xác nhận xóa?",
+        text: `Bạn có chắc chắn muốn xóa tựa sách "${tenSach}" khỏi thư viện?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Xóa ngay!",
+        cancelButtonText: "Hủy",
+      });
+
+      if (result.isConfirmed) {
         try {
           await SachService.delete(id);
+          Swal.fire({
+            title: "Đã xóa!",
+            text: "Xóa sách thành công.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
           this.layDanhSach();
         } catch (error) {
-          alert("LỖI: " + (error.response?.data?.message || ""));
+          Swal.fire(
+            "LỖI",
+            error.response?.data?.message || "Không thể xóa sách!",
+            "error",
+          );
         }
       }
     },
+
     timKiem() {
       this.layDanhSach();
     },
+
     xoaTimKiem() {
       this.searchText = "";
       this.layDanhSach();
     },
+
     chonAnh(event) {
       const file = event.target.files[0];
       if (file) {
@@ -391,6 +416,7 @@ export default {
         this.previewImage = URL.createObjectURL(file);
       }
     },
+
     moFormThem() {
       this.isEdit = false;
       this.editId = null;
@@ -407,6 +433,7 @@ export default {
       this.previewImage = null;
       this.modalInstance.show();
     },
+
     moFormSua(sach) {
       this.isEdit = true;
       this.editId = sach._id;
@@ -424,6 +451,7 @@ export default {
 
       this.modalInstance.show();
     },
+
     async luuSach() {
       try {
         const data = new FormData();
@@ -438,17 +466,18 @@ export default {
 
         if (this.isEdit) {
           await SachService.update(this.editId, data);
-          alert("Cập nhật sách thành công!");
+          Swal.fire("Thành công!", "Cập nhật sách thành công!", "success");
         } else {
           await SachService.create(data);
-          alert("Thêm sách mới thành công!");
+          Swal.fire("Thành công!", "Thêm sách mới thành công!", "success");
         }
-
         this.modalInstance.hide();
         this.layDanhSach();
       } catch (error) {
-        alert(
-          "LỖI: " + (error.response?.data?.message || "Có lỗi xảy ra khi lưu!"),
+        Swal.fire(
+          "LỖI",
+          error.response?.data?.message || "Có lỗi xảy ra khi lưu!",
+          "error",
         );
       }
     },
