@@ -263,29 +263,53 @@ export default {
 
         // --- DATA BIỂU ĐỒ TRÒN (PIE) ---
         const soDaTra = this.tongMuon - this.tongDangMuon;
-        this.chartDataPie.datasets[0].data = [soDaTra, this.tongDangMuon];
+        this.chartDataPie = {
+          labels: ["Đã Trả", "Đang Mượn"],
+          datasets: [
+            {
+              backgroundColor: ["#198754", "#dc3545"],
+              data: [soDaTra, this.tongDangMuon],
+            },
+          ],
+        };
 
         // --- DATA BIỂU ĐỒ CỘT (BAR) ---
         const top5Sach = [...danhSachSach]
           .sort((a, b) => b.SoQuyen - a.SoQuyen)
           .slice(0, 5);
-        this.chartDataBar.labels = top5Sach.map((s) => s.TenSach);
-        this.chartDataBar.datasets[0].data = top5Sach.map((s) => s.SoQuyen);
+        this.chartDataBar = {
+          labels: top5Sach.map((s) => s.TenSach),
+          datasets: [
+            {
+              label: "Số quyển trong kho",
+              backgroundColor: "#0d6efd",
+              borderRadius: 4,
+              data: top5Sach.map((s) => s.SoQuyen),
+            },
+          ],
+        };
 
         // --- DATA BIỂU ĐỒ ĐƯỜNG (LINE) ---
-        // Gom nhóm số lượt mượn theo ngày
         const thongKeTheoNgay = {};
         danhSachMuon.forEach((phieu) => {
           thongKeTheoNgay[phieu.NgayMuon] =
             (thongKeTheoNgay[phieu.NgayMuon] || 0) + 1;
         });
 
-        // Sắp xếp ngày từ cũ đến mới
         const cacNgay = Object.keys(thongKeTheoNgay).sort();
-        this.chartDataLine.labels = cacNgay;
-        this.chartDataLine.datasets[0].data = cacNgay.map(
-          (ngay) => thongKeTheoNgay[ngay],
-        );
+        this.chartDataLine = {
+          labels: cacNgay,
+          datasets: [
+            {
+              label: "Lượt mượn sách",
+              borderColor: "#ffc107",
+              backgroundColor: "#ffc107",
+              tension: 0.3,
+              fill: false,
+              data: cacNgay.map((ngay) => thongKeTheoNgay[ngay]),
+            },
+          ],
+        };
       } catch (error) {
         console.error("Lỗi khi tải dữ liệu thống kê:", error);
       }
