@@ -5,20 +5,19 @@ const ApiError = require("../api-error");
 
 // Tạo và lưu 1 Độc giả mới
 exports.create = async (req, res, next) => {
-    const { HoLot, Ten, Phai, DienThoai, Password } = req.body;
-    if (!HoLot || !Ten || !Phai || !DienThoai || !Password) {
+    const { HoLot, Ten, Phai, DienThoai, Password, NgaySinh } = req.body;
+    
+    if (!HoLot || !Ten || !Phai || !DienThoai || !Password || !NgaySinh) {
         return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc!"));
     }
 
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
-
         const dsSDT = await docgiaService.find({ DienThoai: DienThoai });
         if (dsSDT.length > 0) {
              return next(new ApiError(400, "Lỗi: Số điện thoại này đã được đăng ký cho một Độc giả khác!"));
         }
 
-        // TỰ ĐỘNG SINH MÃ ĐỘC GIẢ (DG + 4 số ngẫu nhiên)
         const randomNum = Math.floor(1000 + Math.random() * 9000);
         req.body.MaDocGia = "DG" + randomNum;
 
@@ -72,17 +71,20 @@ exports.update = async (req, res, next) => {
     if (req.body.Password) {
         delete req.body.Password; 
     }
+    if (req.body.NgaySinh !== undefined && req.body.NgaySinh.trim() === "") {
+        return next(new ApiError(400, "Lỗi: Ngày sinh không được phép để trống!"));
+    }
 
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
         if (req.body.DienThoai) {
             const dsSDT = await docgiaService.find({ DienThoai: req.body.DienThoai });
-            const isDuplicate = dsSDT.some(dg => dg._id.toString() !== req.params.id);
+            const isDuplicate = dsSDT.some(dg => dg._id.toString() !== req.params.id);    
             if (isDuplicate) {
                 return next(new ApiError(400, "Lỗi: Số điện thoại này đã được đăng ký cho một Độc giả khác!"));
             }
         }
-
+        
         const document = await docgiaService.update(req.params.id, req.body);
         if (!document) {
             return next(new ApiError(404, "Không tìm thấy Độc giả"));

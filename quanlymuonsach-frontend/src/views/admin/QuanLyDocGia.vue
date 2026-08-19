@@ -137,6 +137,18 @@
                 />
               </div>
 
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-secondary"
+                  >Ngày Sinh</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  v-model="formData.NgaySinh"
+                  required
+                />
+              </div>
+
               <div class="row mb-3">
                 <div class="col-6">
                   <label class="form-label fw-bold small text-secondary"
@@ -223,9 +235,10 @@ export default {
       searchText: "",
       modalInstance: null,
       formData: {
-        Password: "123",
+        Password: "123456",
         HoLot: "",
         Ten: "",
+        NgaySinh: "",
         DienThoai: "",
         Phai: "Nam",
       },
@@ -261,6 +274,7 @@ export default {
         Password: "123456",
         HoLot: "",
         Ten: "",
+        NgaySinh: "",
         DienThoai: "",
         Phai: "Nam",
       };

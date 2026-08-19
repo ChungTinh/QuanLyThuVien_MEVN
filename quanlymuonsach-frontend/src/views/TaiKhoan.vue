@@ -169,7 +169,17 @@
                   </select>
                 </div>
               </div>
-
+              <div class="mb-3">
+                <label class="form-label fw-medium small text-secondary"
+                  >Ngày Sinh</label
+                >
+                <input
+                  type="date"
+                  class="form-control custom-input"
+                  v-model="registerData.NgaySinh"
+                  required
+                />
+              </div>
               <!-- HIỆN MẬT KHẨU CHO FORM ĐĂNG KÝ -->
               <div class="mb-4">
                 <label class="form-label fw-medium small text-secondary"
@@ -375,15 +385,28 @@
                       </select>
                     </div>
                   </div>
-                  <div class="mb-4">
-                    <label class="form-label text-secondary small fw-medium"
-                      >Địa chỉ</label
-                    >
-                    <input
-                      type="text"
-                      class="form-control custom-input"
-                      v-model="editUser.DiaChi"
-                    />
+                  <div class="row g-3 mb-4">
+                    <div class="col-md-5">
+                      <label class="form-label text-secondary small fw-medium"
+                        >Ngày sinh</label
+                      >
+                      <input
+                        type="date"
+                        class="form-control custom-input"
+                        v-model="editUser.NgaySinh"
+                        required
+                      />
+                    </div>
+                    <div class="col-md-7">
+                      <label class="form-label text-secondary small fw-medium"
+                        >Địa chỉ</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control custom-input"
+                        v-model="editUser.DiaChi"
+                      />
+                    </div>
                   </div>
                   <div class="text-end">
                     <button
