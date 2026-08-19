@@ -218,6 +218,7 @@ import TheoDoiMuonSachService from "@/services/theodoimuonsach.service";
 import DocGiaService from "@/services/docgia.service";
 import SachService from "@/services/sach.service";
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 export default {
   name: "MuonTra",
@@ -315,19 +316,32 @@ export default {
     },
 
     async xoaPhieu(id) {
-      if (
-        confirm(
-          "Hành động này sẽ xóa vĩnh viễn phiếu mượn. Bạn có chắc chắn muốn xóa?",
-        )
-      ) {
+      const result = await Swal.fire({
+        title: "Xác nhận xóa?",
+        text: "Hành động này sẽ xóa vĩnh viễn phiếu mượn. Bạn có chắc chắn muốn xóa?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Xóa ngay!",
+        cancelButtonText: "Hủy",
+      });
+
+      if (result.isConfirmed) {
         try {
           await TheoDoiMuonSachService.delete(id);
-          alert("Phiếu mượn đã bị xóa thành công.");
+          Swal.fire({
+            title: "Đã xóa!",
+            text: "Phiếu mượn đã bị xóa thành công.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
           await this.loadTatCaDuLieu();
         } catch (error) {
           const loiBackend =
             error.response?.data?.message || "Lỗi khi xóa phiếu mượn này!";
-          alert("LỖI: " + loiBackend);
+          Swal.fire("LỖI", loiBackend, "error");
         }
       }
     },
@@ -336,7 +350,6 @@ export default {
 </script>
 
 <style scoped>
-/* Nút Tạo màu tím/xanh */
 .custom-add-btn {
   background-color: #2680ee;
   transition: all 0.3s ease;
@@ -348,7 +361,6 @@ export default {
   box-shadow: 0 4px 10px rgba(90, 143, 249, 0.3) !important;
 }
 
-/* Custom Table */
 .custom-table th {
   border-bottom-width: 1px;
 }
