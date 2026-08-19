@@ -217,6 +217,8 @@
                         type="number"
                         class="form-control"
                         v-model="formData.NamXuatBan"
+                        min="1000"
+                        max="2026"
                         required
                       />
                     </div>
@@ -228,6 +230,7 @@
                         type="number"
                         class="form-control"
                         v-model="formData.DonGia"
+                        min="0"
                         required
                       />
                     </div>
@@ -239,6 +242,7 @@
                         type="number"
                         class="form-control"
                         v-model="formData.SoQuyen"
+                        min="0"
                         required
                       />
                     </div>

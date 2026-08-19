@@ -69,6 +69,7 @@
                       type="text"
                       class="form-control"
                       v-model="editUser.HoTenNV"
+                      minlength="2"
                       required
                     />
                   </div>
@@ -88,6 +89,8 @@
                         type="text"
                         class="form-control"
                         v-model="editUser.SoDienThoai"
+                        pattern="[0-9]{10}"
+                        title="Số điện thoại phải gồm 10 chữ số"
                         required
                       />
                     </div>
@@ -118,6 +121,8 @@
                         :type="showOldPwd ? 'text' : 'password'"
                         class="form-control custom-input border-end-0"
                         v-model="oldPassword"
+                        minlength="6"
+                        title="Mật khẩu phải có ít nhất 6 ký tự"
                         required
                       />
                       <button
@@ -322,34 +327,37 @@ export default {
   methods: {
     async updateInfo() {
       try {
-        // Chỉ bóc lấy các trường được phép sửa, loại bỏ MSNV và ChucVu
         const updateData = {
           HoTenNV: this.editUser.HoTenNV,
           SoDienThoai: this.editUser.SoDienThoai,
           DiaChi: this.editUser.DiaChi,
         };
 
-        // Cập nhật Database
         await NhanVienService.update(this.currentUser._id, updateData);
 
-        // Cập nhật lại LocalStorage và giao diện
         this.currentUser = { ...this.currentUser, ...updateData };
         localStorage.setItem(
           "nhanvien_admin",
           JSON.stringify(this.currentUser),
         );
 
-        alert("Cập nhật thông tin thành công!");
-
-        window.location.reload();
+        Swal.fire({
+          title: "Thành công!",
+          text: "Cập nhật thông tin thành công!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          window.location.reload();
+        });
       } catch (error) {
-        alert("Lỗi khi cập nhật thông tin!");
+        Swal.fire("Lỗi!", "Lỗi khi cập nhật thông tin!", "error");
       }
     },
 
     async updatePassword() {
       if (this.newPassword !== this.confirmPassword) {
-        alert("Mật khẩu xác nhận không khớp!");
+        Swal.fire("Cảnh báo!", "Mật khẩu xác nhận không khớp!", "warning");
         return;
       }
       try {
@@ -358,15 +366,19 @@ export default {
           NewPassword: this.newPassword,
         });
 
-        alert(
+        Swal.fire(
+          "Thành công!",
           "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.",
+          "success",
         );
         this.oldPassword = "";
         this.newPassword = "";
         this.confirmPassword = "";
       } catch (error) {
-        alert(
-          "Lỗi: " + (error.response?.data?.message || "Lỗi khi đổi mật khẩu!"),
+        Swal.fire(
+          "Lỗi!",
+          error.response?.data?.message || "Lỗi khi đổi mật khẩu!",
+          "error",
         );
       }
     },

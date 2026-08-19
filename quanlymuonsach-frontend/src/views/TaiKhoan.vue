@@ -24,13 +24,6 @@
               </p>
             </div>
 
-            <div
-              v-if="errorMessage"
-              class="alert alert-danger py-2 small border-0 shadow-sm rounded-3"
-            >
-              {{ errorMessage }}
-            </div>
-
             <!-- Form Đăng Nhập -->
             <form v-if="!isRegistering" @submit.prevent="handleLogin">
               <div class="mb-3">
@@ -41,12 +34,11 @@
                   type="text"
                   class="form-control custom-input"
                   v-model="loginData.MaDocGia"
-                  placeholder="VD: DG01"
+                  placeholder="VD: DG1234"
                   required
                 />
               </div>
 
-              <!-- HIỆN MẬT KHẨU CHO FORM ĐĂNG NHẬP -->
               <div class="mb-4">
                 <label class="form-label fw-medium small text-secondary"
                   >Mật khẩu</label
@@ -132,6 +124,7 @@
                     type="text"
                     class="form-control custom-input"
                     v-model="registerData.HoLot"
+                    minlength="2"
                     required
                   />
                 </div>
@@ -143,6 +136,7 @@
                     type="text"
                     class="form-control custom-input"
                     v-model="registerData.Ten"
+                    minlength="2"
                     required
                   />
                 </div>
@@ -156,6 +150,8 @@
                     type="text"
                     class="form-control custom-input"
                     v-model="registerData.DienThoai"
+                    pattern="[0-9]{10}"
+                    title="Số điện thoại phải bao gồm 10 chữ số"
                     required
                   />
                 </div>
@@ -184,6 +180,8 @@
                     :type="showPwd1 ? 'text' : 'password'"
                     class="form-control custom-input border-end-0"
                     v-model="registerData.Password"
+                    minlength="6"
+                    title="Mật khẩu phải có ít nhất 6 ký tự"
                     required
                   />
                   <button
@@ -358,6 +356,8 @@
                         type="text"
                         class="form-control custom-input"
                         v-model="editUser.DienThoai"
+                        pattern="[0-9]{10}"
+                        title="Số điện thoại phải bao gồm 10 chữ số"
                         required
                       />
                     </div>
@@ -462,6 +462,7 @@
                         :type="showNewPwd ? 'text' : 'password'"
                         class="form-control custom-input border-end-0"
                         v-model="newPassword"
+                        minlength="6"
                         required
                       />
                       <button
@@ -641,6 +642,7 @@
 import DocGiaService from "@/services/docgia.service";
 import TheoDoiMuonSachService from "@/services/theodoimuonsach.service";
 import SachService from "@/services/sach.service";
+import Swal from "sweetalert2";
 
 export default {
   name: "TaiKhoan",
@@ -656,7 +658,6 @@ export default {
       errorMessage: "",
       isLoading: false,
 
-      // --- CÁC BIẾN ĐIỀU KHIỂN HIỂN THỊ MẬT KHẨU ---
       showPwd1: false,
       showOldPwd: false,
       showNewPwd: false,
@@ -703,10 +704,22 @@ export default {
       }
     },
     handleLogout() {
-      localStorage.removeItem("docgia_khachhang");
-      this.isLoggedIn = false;
-      this.currentUser = null;
-      this.loginData = { MaDocGia: "", Password: "" };
+      Swal.fire({
+        title: "Xác nhận đăng xuất?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Đăng xuất",
+        cancelButtonText: "Hủy",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem("docgia_khachhang");
+          this.isLoggedIn = false;
+          this.currentUser = null;
+          this.loginData = { MaDocGia: "", Password: "" };
+        }
+      });
     },
     async updateInfo() {
       try {
@@ -716,15 +729,21 @@ export default {
           "docgia_khachhang",
           JSON.stringify(this.currentUser),
         );
-        alert("Cập nhật thông tin thành công!");
+        Swal.fire({
+          title: "Thành công!",
+          text: "Cập nhật thông tin thành công!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        alert("Lỗi khi cập nhật thông tin!");
+        Swal.fire("Lỗi!", "Có lỗi xảy ra khi cập nhật thông tin!", "error");
       }
     },
 
     async updatePassword() {
       if (this.newPassword !== this.confirmPassword) {
-        alert("Mật khẩu xác nhận không khớp!");
+        Swal.fire("Cảnh báo!", "Mật khẩu xác nhận không khớp!", "warning");
         return;
       }
       try {
@@ -733,15 +752,20 @@ export default {
           NewPassword: this.newPassword,
         });
 
-        alert(
-          "Đổi mật khẩu thành công! Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.",
-        );
+        Swal.fire({
+          title: "Đổi mật khẩu thành công!",
+          text: "Vui lòng sử dụng mật khẩu mới cho lần đăng nhập sau.",
+          icon: "success",
+        });
+
         this.oldPassword = "";
         this.newPassword = "";
         this.confirmPassword = "";
       } catch (error) {
-        alert(
-          "Lỗi: " + (error.response?.data?.message || "Lỗi khi đổi mật khẩu!"),
+        Swal.fire(
+          "LỖI",
+          error.response?.data?.message || "Lỗi khi đổi mật khẩu!",
+          "error",
         );
       }
     },
@@ -773,9 +797,11 @@ export default {
         const response = await DocGiaService.create(this.registerData);
         const maMoiSinh = response.MaDocGia || response.data?.MaDocGia;
 
-        alert(
-          `Đăng ký thành công!\n\nMã Độc Giả của bạn là: ${maMoiSinh}\nVui lòng ghi nhớ mã này để đăng nhập.`,
-        );
+        Swal.fire({
+          title: "Đăng ký thành công!",
+          text: `Mã Độc Giả của bạn là: ${maMoiSinh}\nVui lòng ghi nhớ mã này để đăng nhập.`,
+          icon: "success",
+        });
 
         this.isRegistering = false;
         this.loginData.MaDocGia = maMoiSinh;

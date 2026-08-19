@@ -132,6 +132,7 @@
                   type="text"
                   class="form-control"
                   v-model="formData.Password"
+                  minlength="6"
                   required
                 />
               </div>
@@ -145,6 +146,7 @@
                     type="text"
                     class="form-control"
                     v-model="formData.HoLot"
+                    minlength="2"
                     required
                   />
                 </div>
@@ -156,6 +158,7 @@
                     type="text"
                     class="form-control"
                     v-model="formData.Ten"
+                    minlength="1"
                     required
                   />
                 </div>
@@ -169,6 +172,8 @@
                     type="text"
                     class="form-control"
                     v-model="formData.DienThoai"
+                    pattern="[0-9]{10}"
+                    title="Số điện thoại phải bao gồm 10 chữ số"
                     required
                   />
                 </div>
@@ -208,6 +213,7 @@
 <script>
 import DocGiaService from "@/services/docgia.service";
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 export default {
   name: "QuanLyDocGia",
@@ -258,19 +264,32 @@ export default {
       this.modalInstance.show();
     },
     async xoaDocGia(id, tenDocGia) {
-      if (
-        confirm(
-          `Bạn có chắc chắn muốn xóa độc giả "${tenDocGia}" khỏi hệ thống không?`,
-        )
-      ) {
+      const result = await Swal.fire({
+        title: "Xác nhận xóa?",
+        text: `Bạn có chắc chắn muốn xóa độc giả "${tenDocGia}" khỏi hệ thống không?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Xóa ngay!",
+        cancelButtonText: "Hủy",
+      });
+
+      if (result.isConfirmed) {
         try {
           await DocGiaService.delete(id);
-          alert("Đã xóa độc giả thành công!");
+          Swal.fire({
+            title: "Đã xóa!",
+            text: "Xóa độc giả thành công.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
           this.layDanhSach();
         } catch (error) {
           const loiBackend =
             error.response?.data?.message || "Lỗi khi xóa độc giả này!";
-          alert("LỖI: " + loiBackend);
+          Swal.fire("LỖI", loiBackend, "error");
         }
       }
     },
@@ -278,14 +297,20 @@ export default {
       try {
         const response = await DocGiaService.create(this.formData);
         const maMoiSinh = response.MaDocGia || response.data?.MaDocGia;
-        alert(
-          `Đã tạo Độc giả thành công!\n\nMã Độc Giả vừa được cấp là: ${maMoiSinh}`,
-        );
+        Swal.fire({
+          title: "Thành công!",
+          text: `Đã tạo Độc giả thành công!\nMã Độc Giả vừa được cấp là: ${maMoiSinh}`,
+          icon: "success",
+        });
 
         this.modalInstance.hide();
         this.layDanhSach();
       } catch (error) {
-        alert("Lỗi: " + (error.response?.data?.message || "Lỗi server!"));
+        Swal.fire(
+          "Lỗi!",
+          error.response?.data?.message || "Lỗi server!",
+          "error",
+        );
       }
     },
   },

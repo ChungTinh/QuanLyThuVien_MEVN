@@ -101,6 +101,7 @@
                   type="text"
                   class="form-control"
                   v-model="formData.Password"
+                  minlength="6"
                   required
                 />
               </div>
@@ -113,9 +114,11 @@
                   type="text"
                   class="form-control"
                   v-model="formData.HoTenNV"
+                  minlength="2"
                   required
                 />
               </div>
+
               <div class="row mb-3">
                 <div class="col-6">
                   <label class="form-label fw-bold small text-secondary"
@@ -134,6 +137,8 @@
                     type="text"
                     class="form-control"
                     v-model="formData.SoDienThoai"
+                    pattern="[0-9]{10}"
+                    title="Số điện thoại phải gồm 10 chữ số"
                     required
                   />
                 </div>
@@ -174,6 +179,7 @@
 <script>
 import NhanVienService from "@/services/nhanvien.service";
 import * as bootstrap from "bootstrap";
+import Swal from "sweetalert2";
 
 export default {
   name: "QuanLyNhanVien",
@@ -219,15 +225,19 @@ export default {
         const response = await NhanVienService.create(this.formData);
         const maMoiSinh = response.MSNV || response.data?.MSNV;
 
-        alert(
-          `Đã thêm nhân sự thành công!\n\nMã Nhân Viên mới là: ${maMoiSinh}`,
+        Swal.fire(
+          "Thành công!",
+          `Đã thêm nhân sự thành công!\nMã Nhân Viên mới: ${maMoiSinh}`,
+          "success",
         );
 
         this.modalInstance.hide();
         this.layDanhSach();
       } catch (error) {
-        alert(
-          "Lỗi: " + (error.response?.data?.message || "Lỗi tạo tài khoản!"),
+        Swal.fire(
+          "Lỗi!",
+          error.response?.data?.message || "Lỗi tạo tài khoản!",
+          "error",
         );
       }
     },
@@ -236,16 +246,32 @@ export default {
         localStorage.getItem("nhanvien_admin"),
       );
       if (nguoiDangDangNhap._id === id) {
-        alert("LỖI BẢO MẬT: Bạn không thể tự xóa tài khoản của chính mình!");
+        Swal.fire(
+          "LỖI BẢO MẬT",
+          "Bạn không thể tự xóa tài khoản của chính mình!",
+          "error",
+        );
         return;
       }
-      if (confirm(`Chắc chắn muốn xóa tài khoản của "${ten}"?`)) {
+
+      const result = await Swal.fire({
+        title: "Xác nhận xóa?",
+        text: `Chắc chắn muốn xóa tài khoản của "${ten}"?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Xóa ngay!",
+        cancelButtonText: "Hủy",
+      });
+
+      if (result.isConfirmed) {
         try {
           await NhanVienService.delete(id);
           this.layDanhSach();
-          alert("Xóa nhân viên thành công!");
+          Swal.fire("Đã xóa!", "Xóa nhân viên thành công!", "success");
         } catch (error) {
-          alert("Lỗi khi xóa!");
+          Swal.fire("Lỗi!", "Có lỗi khi xóa!", "error");
         }
       }
     },

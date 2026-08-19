@@ -136,6 +136,8 @@
 </template>
 
 <script>
+import Swal from "sweetalert2";
+
 export default {
   name: "AdminLayout",
   data() {
@@ -151,9 +153,20 @@ export default {
   },
   methods: {
     dangXuat() {
-      localStorage.removeItem("nhanvien_admin");
-      alert("Đã đăng xuất khỏi hệ thống Admin!");
-      this.$router.push("/");
+      Swal.fire({
+        title: "Xác nhận đăng xuất?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Đăng xuất",
+        cancelButtonText: "Hủy",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem("nhanvien_admin");
+          this.$router.push("/");
+        }
+      });
     },
   },
 };

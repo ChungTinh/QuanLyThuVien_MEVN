@@ -273,13 +273,42 @@ export default {
     async taoPhieu() {
       try {
         await TheoDoiMuonSachService.create(this.formData);
-        alert("Tạo phiếu mượn thành công!");
+        Swal.fire("Thành công!", "Tạo phiếu mượn thành công!", "success");
         this.modalInstance.hide();
         await this.loadTatCaDuLieu();
       } catch (error) {
-        alert(
-          "Lỗi: " + (error.response?.data?.message || "Không thể tạo phiếu"),
+        Swal.fire(
+          "Lỗi!",
+          error.response?.data?.message || "Không thể tạo phiếu",
+          "error",
         );
+      }
+    },
+    async xacNhanTra(idPhieu) {
+      const result = await Swal.fire({
+        title: "Xác nhận trả sách?",
+        text: "Khách hàng đã trả lại cuốn sách này?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#28a745",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Đã trả!",
+        cancelButtonText: "Chưa",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const ngayTra = new Date().toISOString().split("T")[0];
+          await TheoDoiMuonSachService.update(idPhieu, { NgayTra: ngayTra });
+          Swal.fire(
+            "Thành công!",
+            "Đã cập nhật trạng thái Trả sách!",
+            "success",
+          );
+          await this.loadTatCaDuLieu();
+        } catch (error) {
+          Swal.fire("Lỗi!", "Có lỗi khi cập nhật!", "error");
+        }
       }
     },
     async xacNhanTra(idPhieu) {
