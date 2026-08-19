@@ -7,21 +7,24 @@ const ApiError = require("../api-error");
 exports.create = async (req, res, next) => {
     const { HoLot, Ten, Phai, DienThoai, Password } = req.body;
     if (!HoLot || !Ten || !Phai || !DienThoai || !Password) {
-        return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc (Họ lót, Tên, Giới tính, SĐT, Mật khẩu)!"));
+        return next(new ApiError(400, "Lỗi: Không được bỏ trống thông tin bắt buộc!"));
     }
-
-    // Tạo mã độc giả ngẫu nhiên
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    req.body.MaDocGia = "DG" + randomNum;
 
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
+
+        const dsSDT = await docgiaService.find({ DienThoai: DienThoai });
+        if (dsSDT.length > 0) {
+             return next(new ApiError(400, "Lỗi: Số điện thoại này đã được đăng ký cho một Độc giả khác!"));
+        }
+
+        // TỰ ĐỘNG SINH MÃ ĐỘC GIẢ (DG + 4 số ngẫu nhiên)
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        req.body.MaDocGia = "DG" + randomNum;
+
         const document = await docgiaService.create(req.body);
         return res.send(document);
     } catch (error) {
-        if (error.message.includes("đã tồn tại")) {
-            return next(new ApiError(400, "Hệ thống bận, vui lòng bấm đăng ký lại!")); 
-        }
         return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Độc giả."));
     }
 };
@@ -65,15 +68,28 @@ exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Dữ liệu cập nhật không được rỗng"));
     }
+
+    if (req.body.Password) {
+        delete req.body.Password; 
+    }
+
     try {
         const docgiaService = new DocGiaService(MongoDB.client);
+        if (req.body.DienThoai) {
+            const dsSDT = await docgiaService.find({ DienThoai: req.body.DienThoai });
+            const isDuplicate = dsSDT.some(dg => dg._id.toString() !== req.params.id);
+            if (isDuplicate) {
+                return next(new ApiError(400, "Lỗi: Số điện thoại này đã được đăng ký cho một Độc giả khác!"));
+            }
+        }
+
         const document = await docgiaService.update(req.params.id, req.body);
         if (!document) {
             return next(new ApiError(404, "Không tìm thấy Độc giả"));
         }
         return res.send({ message: "Cập nhật Độc giả thành công" });
     } catch (error) {
-        return next(new ApiError(500, `Lỗi cập nhật Độc giả có id=${req.params.id}`));
+        return next(new ApiError(500, `Lỗi cập nhật Độc giả id=${req.params.id}`));
     }
 };
 

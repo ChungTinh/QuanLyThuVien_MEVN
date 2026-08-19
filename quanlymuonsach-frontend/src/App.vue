@@ -11,7 +11,6 @@
       </main>
       <AppFooter />
     </div>
-
     <div v-else class="d-flex flex-column min-vh-100 w-100">
       <main class="flex-grow-1 d-flex flex-column">
         <router-view />
@@ -47,7 +46,7 @@ export default {
   },
   methods: {
     toggleTheme() {
-      // Đảo theme và lưu lại
+      // Đảo theme
       this.currentTheme = this.currentTheme === "light" ? "dark" : "light";
       localStorage.setItem("app-theme", this.currentTheme);
     },

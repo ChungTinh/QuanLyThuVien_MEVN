@@ -210,9 +210,10 @@ export default {
         console.error(error);
       }
     },
+
     moFormThem() {
       this.formData = {
-        Password: "123",
+        Password: "123456",
         HoTenNV: "",
         ChucVu: "Nhân Viên",
         DiaChi: "",
@@ -220,6 +221,7 @@ export default {
       };
       this.modalInstance.show();
     },
+
     async luuNhanVien() {
       try {
         const response = await NhanVienService.create(this.formData);
@@ -241,6 +243,7 @@ export default {
         );
       }
     },
+
     async xoaNhanVien(id, ten) {
       const nguoiDangDangNhap = JSON.parse(
         localStorage.getItem("nhanvien_admin"),

@@ -321,6 +321,7 @@
 
           <div class="card-body p-4 p-md-5">
             <div class="tab-content">
+              <!-- TAB CẬP NHẬT THÔNG TIN -->
               <div class="tab-pane fade show active" id="info">
                 <form @submit.prevent="updateInfo">
                   <div class="row g-3 mb-3">

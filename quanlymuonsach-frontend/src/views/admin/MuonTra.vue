@@ -56,7 +56,7 @@
                   >
                 </td>
 
-                <!-- CỘT HÀNH ĐỘNG ĐƯỢC CHỈNH LẠI -->
+                <!-- CỘT HÀNH ĐỘNG -->
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
                     <button
@@ -132,7 +132,6 @@
           </div>
           <div class="modal-body p-4">
             <form @submit.prevent="taoPhieu">
-              <!-- Chọn Độc Giả -->
               <div class="mb-3">
                 <label class="form-label fw-bold text-secondary small"
                   >Chọn Độc Giả</label
@@ -155,7 +154,6 @@
                 </select>
               </div>
 
-              <!-- Chọn Sách -->
               <div class="mb-3">
                 <label class="form-label fw-bold text-secondary small"
                   >Chọn Sách Mượn</label
@@ -180,7 +178,6 @@
                 </select>
               </div>
 
-              <!-- Ngày Mượn -->
               <div class="mb-4">
                 <label class="form-label fw-bold text-secondary small"
                   >Ngày Mượn</label
@@ -253,14 +250,17 @@ export default {
         console.error("Lỗi lấy dữ liệu:", error);
       }
     },
+
     layTenDocGia(maDocGia) {
       const dg = this.docGias.find((d) => d.MaDocGia === maDocGia);
       return dg ? `${dg.HoLot} ${dg.Ten}` : maDocGia;
     },
+
     layTenSach(maSach) {
       const sach = this.sachs.find((s) => s.MaSach === maSach);
       return sach ? sach.TenSach : maSach;
     },
+
     moFormTaoPhieu() {
       const homNay = new Date().toISOString().split("T")[0];
       this.formData = {
@@ -270,6 +270,7 @@ export default {
       };
       this.modalInstance.show();
     },
+
     async taoPhieu() {
       try {
         await TheoDoiMuonSachService.create(this.formData);
@@ -284,6 +285,7 @@ export default {
         );
       }
     },
+
     async xacNhanTra(idPhieu) {
       const result = await Swal.fire({
         title: "Xác nhận trả sách?",
@@ -308,18 +310,6 @@ export default {
           await this.loadTatCaDuLieu();
         } catch (error) {
           Swal.fire("Lỗi!", "Có lỗi khi cập nhật!", "error");
-        }
-      }
-    },
-    async xacNhanTra(idPhieu) {
-      if (confirm("Xác nhận khách hàng đã trả cuốn sách này?")) {
-        try {
-          const ngayTra = new Date().toISOString().split("T")[0];
-          await TheoDoiMuonSachService.update(idPhieu, { NgayTra: ngayTra });
-          alert("Đã cập nhật trạng thái Trả sách!");
-          await this.loadTatCaDuLieu();
-        } catch (error) {
-          alert("Lỗi khi cập nhật!");
         }
       }
     },

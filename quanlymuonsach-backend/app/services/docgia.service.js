@@ -26,16 +26,15 @@ class DocGiaService {
 
     // Thêm mới (Create)
     async create(payload) {
-    const docgia = this.extractDocGiaData(payload);
+        const docgia = this.extractDocGiaData(payload);
+        const tonTai = await this.DocGia.findOne({ MaDocGia: docgia.MaDocGia });
+        if (tonTai) {
+            throw new Error("Mã Độc giả này đã tồn tại trong hệ thống!");
+        }
 
-    const tonTai = await this.DocGia.findOne({ MaDocGia: docgia.MaDocGia });
-    if (tonTai) {
-        throw new Error("Mã Độc giả này đã tồn tại trong hệ thống!");
+        const result = await this.DocGia.insertOne(docgia);
+        return await this.DocGia.findOne({ _id: result.insertedId });
     }
-
-    const result = await this.DocGia.insertOne(docgia);
-    return await this.DocGia.findOne({ _id: result.insertedId });
-}
 
     // Lấy danh sách (Read all)
     async find(filter) {

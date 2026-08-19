@@ -9,13 +9,13 @@
         <span style="font-size: 1.5rem">📚</span> Thư Viện Sách
       </router-link>
 
-      <!-- Nút toggle cho điện thoại (Bỏ thuộc tính của Bootstrap, dùng Vue @click) -->
+      <!-- Nút toggle cho điện thoại -->
       <button
         class="navbar-toggler border-0 shadow-none"
         type="button"
         @click="toggleMenu"
       >
-        <!-- Icon 3 gạch -->
+        <!-- Icon List dành cho điện thoại -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="28"
@@ -31,7 +31,7 @@
         </svg>
       </button>
 
-      <!-- Menu chính (Dùng Vue :class để ép thêm class 'show' khi mở) -->
+      <!-- Menu chính -->
       <div
         class="collapse navbar-collapse"
         :class="{ show: isMenuOpen }"
@@ -171,7 +171,6 @@ export default {
 </script>
 
 <style scoped>
-/* CSS giữ nguyên như bản trước */
 .custom-navbar {
   background-color: var(--nav-bg) !important;
   transition: background-color 0.3s ease;

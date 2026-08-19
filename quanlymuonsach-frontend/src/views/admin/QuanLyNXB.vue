@@ -207,18 +207,22 @@ export default {
         console.error(error);
       }
     },
+
     timKiem() {
       this.layDanhSach();
     },
+
     xoaTimKiem() {
       this.searchText = "";
       this.layDanhSach();
     },
+
     moFormThem() {
       this.isEdit = false;
       this.formData = { TenNXB: "", DiaChi: "" };
       this.modalInstance.show();
     },
+
     moFormSua(nxb) {
       this.isEdit = true;
       this.editId = nxb._id;
@@ -228,6 +232,7 @@ export default {
       };
       this.modalInstance.show();
     },
+
     async luuNXB() {
       try {
         if (this.isEdit) {
@@ -256,6 +261,7 @@ export default {
         );
       }
     },
+
     async xoaNXB(id, ten) {
       const result = await Swal.fire({
         title: "Xác nhận xóa?",

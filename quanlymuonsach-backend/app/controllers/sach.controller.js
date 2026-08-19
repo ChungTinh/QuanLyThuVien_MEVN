@@ -119,14 +119,12 @@ exports.update = async (req, res, next) => {
         }
 
         const fileName = generateSafeFileName(req.file.originalname);
-        
         try {
             const { error: uploadError } = await supabase.storage
                 .from('quanlythuvien')
                 .upload(fileName, req.file.buffer, {
                     contentType: req.file.mimetype,
                 });
-
             if (uploadError) {
                 return next(new ApiError(400, `[Supabase Upload Error]: ${uploadError.message}`));
             }
@@ -134,7 +132,6 @@ exports.update = async (req, res, next) => {
             const { data: publicUrlData } = supabase.storage
                 .from('quanlythuvien')
                 .getPublicUrl(fileName);
-
             req.body.HinhAnh = publicUrlData.publicUrl;
 
         } catch (error) {

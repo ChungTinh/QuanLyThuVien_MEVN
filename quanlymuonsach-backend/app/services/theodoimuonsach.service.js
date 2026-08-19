@@ -21,31 +21,25 @@ class TheoDoiMuonSachService {
     }
 
     // Thêm mới (Create)
-    // Thêm mới (Create)
     async create(payload) {
         const theodoi = this.extractData(payload);
-
-        // 1. Kiểm tra Sách có tồn tại trong hệ thống
         const sach = await this.Sach.findOne({ MaSach: theodoi.MaSach });
         if (!sach) {
             throw new Error("Mã sách không tồn tại trong hệ thống!");
         }
 
-        // 2. Đếm số lượng người đang mượn cuốn sách này (NgayTra = null)
+        // Đếm số lượng người đang mượn cuốn sách này (NgayTra = null)
         const soLuongDangMuon = await this.TheoDoi.countDocuments({
             MaSach: theodoi.MaSach,
             NgayTra: null 
         });
-
-        // 3. Tính toán số sách còn thực tế
+        // Tính toán số sách còn thực tế
         const soSachConLai = sach.SoQuyen - soLuongDangMuon;
-
-        // 4. Chặn nếu hết sách
         if (soSachConLai <= 0) {
             throw new Error("Sách này hiện đã được mượn hết, vui lòng quay lại sau!");
         }
 
-        // 5. Ghi nhận lượt mượn 
+        // Ghi nhận lượt mượn 
         const result = await this.TheoDoi.insertOne(theodoi);
         return await this.TheoDoi.findOne({ _id: result.insertedId });
     }

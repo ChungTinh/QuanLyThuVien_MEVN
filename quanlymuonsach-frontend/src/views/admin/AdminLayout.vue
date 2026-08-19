@@ -1,11 +1,10 @@
 <template>
   <div class="d-flex w-100 bg-light" style="height: 100vh">
-    <!-- SIDEBAR BÊN TRÁI (Nền trắng hiện đại) -->
+    <!-- SIDEBAR BÊN TRÁI -->
     <div
       class="bg-white shadow-sm d-flex flex-column position-relative"
       style="width: 260px; z-index: 10"
     >
-      <!-- Tiêu đề Admin -->
       <div class="p-4 text-center border-bottom">
         <h4 class="fw-bold mb-0" style="color: #6a5af9">
           <span class="fs-4">⚙️</span> ADMIN PANEL
@@ -30,7 +29,6 @@
             {{ currentUser.ChucVu }}
           </span>
         </div>
-        <!-- NÚT CẬP NHẬT HỒ SƠ RÕ RÀNG -->
         <router-link
           to="/admin/hoso"
           class="btn btn-outline-primary btn-sm rounded-pill w-100 fw-bold custom-btn-outline"
@@ -173,7 +171,6 @@ export default {
 </script>
 
 <style scoped>
-/* Tuỳ chỉnh Avatar */
 .avatar-gradient {
   width: 64px;
   height: 64px;
@@ -181,7 +178,6 @@ export default {
   background: linear-gradient(135deg, #6a5af9 0%, #d66efd 100%);
 }
 
-/* Nút Cập nhật hồ sơ */
 .custom-btn-outline {
   color: #5abcf9;
   border-color: #25a4f9;
@@ -193,7 +189,6 @@ export default {
   box-shadow: 0 4px 10px rgba(15, 136, 250, 0.3);
 }
 
-/* Tuỳ chỉnh các Link Menu */
 .custom-nav-link {
   color: #495057;
   transition: all 0.2s ease;
@@ -210,14 +205,12 @@ export default {
   border-left: 4px solid #136bc4;
 }
 
-/* Menu dành riêng cho QTV (Màu đỏ) */
 .custom-nav-link.active-danger {
   background-color: rgba(220, 53, 69, 0.1);
   color: #dc3545 !important;
   border-left: 4px solid #dc3545;
 }
 
-/* Nút đăng xuất */
 .custom-logout {
   transition: all 0.3s ease;
 }
@@ -226,7 +219,6 @@ export default {
   color: #fff !important;
 }
 
-/* Làm đẹp thanh cuộn */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }

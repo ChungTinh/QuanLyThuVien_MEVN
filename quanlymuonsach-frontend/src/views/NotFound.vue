@@ -1,5 +1,4 @@
 <template>
-  <!-- Sửa vh-100 thành w-100 flex-grow-1 và thêm padding -->
   <div
     class="d-flex flex-column align-items-center justify-content-center bg-light w-100 text-center py-5 flex-grow-1"
   >

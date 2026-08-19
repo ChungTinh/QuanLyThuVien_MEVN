@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4 mb-5">
-    <!-- Banner chính (Hero Section) -->
+    <!-- Banner chính -->
     <div
       class="p-5 mb-4 rounded-4 shadow-sm text-center hero-section position-relative overflow-hidden"
     >
@@ -36,7 +36,6 @@
           Khám Phá Tủ Sách
         </router-link>
       </div>
-      <!-- Lớp phủ màu gradient -->
       <div class="hero-bg-overlay"></div>
     </div>
 

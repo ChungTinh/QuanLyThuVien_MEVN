@@ -27,7 +27,6 @@
       </div>
     </div>
 
-    <!-- ĐƯỜNG CHIA CẮT TRANG TRÍ -->
     <div class="d-flex justify-content-center align-items-center mb-5">
       <span
         style="
@@ -52,7 +51,6 @@
     <div class="row justify-content-center align-items-center g-5">
       <div class="col-md-5 text-center">
         <div class="p-4 bg-white rounded-4 shadow-sm border">
-          <!-- Logo CTU lấy từ Wikipedia cho rõ nét -->
           <img
             src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoVthllgZMzzjeooEpcVw8WjGvop8rP_X3-Je53VUz-sZUQ5UFwmfp__4g&s=10"
             alt="Đại học Cần Thơ"

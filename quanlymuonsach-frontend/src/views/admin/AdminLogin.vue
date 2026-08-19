@@ -6,13 +6,11 @@
       class="card shadow-lg border-0 rounded-4 overflow-hidden"
       style="width: 420px; max-width: 90%"
     >
-      <!-- Phần Header của Form -->
       <div class="card-header bg-dark text-center py-4 border-0">
         <div
           class="d-inline-flex align-items-center justify-content-center bg-warning rounded-circle mb-3 shadow"
           style="width: 60px; height: 60px"
         >
-          <!-- Icon Ổ khóa SVG xịn xò -->
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="28"
@@ -33,7 +31,7 @@
         </p>
       </div>
 
-      <!-- Phần Body nhập liệu -->
+      <!-- Body nhập liệu -->
       <div class="card-body p-4 p-md-5 bg-white">
         <div
           v-if="error"
@@ -153,7 +151,7 @@ export default {
         const response = await NhanVienService.login(this.loginData);
         // Lưu chìa khóa riêng biệt tên là "nhanvien_admin"
         localStorage.setItem("nhanvien_admin", JSON.stringify(response.user));
-        this.$router.push("/admin"); // Thành công thì đẩy vào Dashboard
+        this.$router.push("/admin");
       } catch (err) {
         this.error = err.response?.data?.message || "Lỗi đăng nhập!";
       }
@@ -163,12 +161,10 @@ export default {
 </script>
 
 <style scoped>
-/* Nền gradient hiện đại */
 .admin-login-bg {
   background: linear-gradient(135deg, #1c1e22 0%, #3a3f47 100%);
 }
 
-/* Custom Input */
 .custom-input {
   background-color: #f8f9fa;
   border-color: #e9ecef;
@@ -184,7 +180,6 @@ export default {
   border-color: #e9ecef;
 }
 
-/* Khi focus vào input thì đổi màu icon */
 .input-group:focus-within .input-group-text {
   color: #ffc107 !important;
   background-color: #fff;
@@ -194,7 +189,6 @@ export default {
   border-color: #ffc107;
 }
 
-/* Nút bấm vàng đặc trưng */
 .custom-btn {
   transition: all 0.3s ease;
 }
@@ -204,7 +198,6 @@ export default {
   box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4) !important;
 }
 
-/* Link quay lại */
 .custom-link-back {
   transition: color 0.3s ease;
 }

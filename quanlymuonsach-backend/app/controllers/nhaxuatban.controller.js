@@ -10,17 +10,20 @@ exports.create = async (req, res, next) => {
         return next(new ApiError(400, "Lỗi: Vui lòng nhập Tên NXB và Địa chỉ!"));
     }
 
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    req.body.MaNXB = "NXB" + randomNum;
-
     try {
         const nhaxuatbanService = new NhaXuatBanService(MongoDB.client);
+        const dsNXB = await nhaxuatbanService.find({ TenNXB: TenNXB });
+        if (dsNXB.length > 0) {
+            return next(new ApiError(400, "Lỗi: Tên Nhà Xuất Bản này đã tồn tại trong hệ thống!"));
+        }
+
+        // Tự sinh mã NXB (NXB + 4 số ngẫu nhiên)
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        req.body.MaNXB = "NXB" + randomNum;
+
         const document = await nhaxuatbanService.create(req.body);
         return res.send(document);
     } catch (error) {
-        if (error.message.includes("đã tồn tại")) {
-            return next(new ApiError(400, "Hệ thống bận, vui lòng thử lại!"));
-        }
         return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Nhà Xuất Bản."));
     }
 };
@@ -64,15 +67,25 @@ exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Dữ liệu cập nhật không được rỗng"));
     }
+
     try {
-        const nxbService = new NhaXuatBanService(MongoDB.client);
-        const document = await nxbService.update(req.params.id, req.body);
-        if (!document) {
-            return next(new ApiError(404, "Không tìm thấy Nhà Xuất Bản"));
+        const nhaxuatbanService = new NhaXuatBanService(MongoDB.client);
+
+        if (req.body.TenNXB) {
+            const dsNXB = await nhaxuatbanService.find({ TenNXB: req.body.TenNXB });
+            const isDuplicate = dsNXB.some(nxb => nxb._id.toString() !== req.params.id);   
+            if (isDuplicate) {
+                return next(new ApiError(400, "Lỗi: Tên Nhà Xuất Bản này đã tồn tại trong hệ thống!"));
+            }
         }
-        return res.send({ message: "Cập nhật Nhà Xuất Bản thành công" });
+
+        const document = await nhaxuatbanService.update(req.params.id, req.body);
+        if (!document) {
+            return next(new ApiError(404, "Không tìm thấy Nhà xuất bản"));
+        }
+        return res.send({ message: "Cập nhật Nhà xuất bản thành công" });
     } catch (error) {
-        return next(new ApiError(500, `Lỗi cập nhật Nhà Xuất Bản có id=${req.params.id}`));
+        return next(new ApiError(500, `Lỗi cập nhật Nhà xuất bản id=${req.params.id}`));
     }
 };
 

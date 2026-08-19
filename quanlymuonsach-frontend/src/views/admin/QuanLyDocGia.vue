@@ -246,16 +246,19 @@ export default {
         console.error("Lỗi:", error);
       }
     },
+
     timKiem() {
       this.layDanhSach();
     },
+
     xoaTimKiem() {
       this.searchText = "";
       this.layDanhSach();
     },
+
     moFormThem() {
       this.formData = {
-        Password: "123",
+        Password: "123456",
         HoLot: "",
         Ten: "",
         DienThoai: "",
@@ -263,6 +266,7 @@ export default {
       };
       this.modalInstance.show();
     },
+
     async xoaDocGia(id, tenDocGia) {
       const result = await Swal.fire({
         title: "Xác nhận xóa?",
@@ -293,6 +297,7 @@ export default {
         }
       }
     },
+
     async luuDocGia() {
       try {
         const response = await DocGiaService.create(this.formData);

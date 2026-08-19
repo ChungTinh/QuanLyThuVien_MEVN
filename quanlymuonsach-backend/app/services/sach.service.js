@@ -25,17 +25,12 @@ class SachService {
     }
 
     // Thêm mới (Create)
-    // Thêm mới (Create)
     async create(payload) {
         const sach = this.extractSachData(payload);
-        
-        // Kiểm tra xem MaSach đã tồn tại chưa
         const tonTai = await this.Sach.findOne({ MaSach: sach.MaSach });
         if (tonTai) {
             throw new Error("Mã Sách này đã tồn tại trong kho!");
         }
-
-        // Tạo mới nếu chưa tồn tại
         const result = await this.Sach.insertOne(sach);
         return await this.Sach.findOne({ _id: result.insertedId });
     }
@@ -73,7 +68,6 @@ class SachService {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
         if (!sach) return null;
-
         const danhSachMuon = await this.TheoDoi.find({ MaSach: sach.MaSach }).toArray();
 
         if (danhSachMuon.length > 0) {
@@ -83,7 +77,6 @@ class SachService {
             
             let thongBaoError = `Không thể xóa Sách! Sách này đang dính ${danhSachMuon.length} lịch sử mượn/trả.\nChi tiết: ${chiTiet.join(", ")}`;
             if (danhSachMuon.length > 3) thongBaoError += `...`;
-
             throw new Error(thongBaoError);
         }
         

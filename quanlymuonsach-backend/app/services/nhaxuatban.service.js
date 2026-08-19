@@ -22,7 +22,6 @@ class NhaXuatBanService {
     // Thêm mới (Create)
     async create(payload) {
         const nhaxuatban = this.extractNhaXuatBanData(payload);      
-        
         const tonTai = await this.NhaXuatBan.findOne({ MaNXB: nhaxuatban.MaNXB });
         if (tonTai) {
             throw new Error("Mã Nhà Xuất Bản này đã tồn tại!");

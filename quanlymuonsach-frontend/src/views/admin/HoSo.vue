@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <!-- Cột phải: Form cập nhật 2 Tab -->
+      <!-- Cột phải: Form cập nhật -->
       <div class="col-md-8">
         <div class="card shadow-sm border-0">
           <div class="card-header bg-white pt-3 pb-0 border-bottom-0">
@@ -310,14 +310,13 @@ export default {
       newPassword: "",
       confirmPassword: "",
 
-      // --- BIẾN ĐIỀU KHIỂN MẮT ---
+      // --- Biến điều khiển hiển thị mật khẩu ---
       showOldPwd: false,
       showNewPwd: false,
       showConfirmPwd: false,
     };
   },
   mounted() {
-    // Đọc thông tin từ localStorage lên
     const user = localStorage.getItem("nhanvien_admin");
     if (user) {
       this.currentUser = JSON.parse(user);

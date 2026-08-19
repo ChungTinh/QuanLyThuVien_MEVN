@@ -2,7 +2,7 @@
   <div>
     <h3 class="fw-bold text-primary mb-4">📊 Bảng Điều Khiển (Dashboard)</h3>
 
-    <!-- 4 Thẻ Summary -->
+    <!-- Thẻ Summary -->
     <div class="row g-3 mb-4">
       <div class="col-md-3">
         <div
@@ -154,9 +154,8 @@
 import SachService from "@/services/sach.service";
 import DocGiaService from "@/services/docgia.service";
 import TheoDoiMuonSachService from "@/services/theodoimuonsach.service";
-
-// Bổ sung import Line và Pie
 import { Bar, Pie, Line } from "vue-chartjs";
+
 import {
   Chart as ChartJS,
   Title,
@@ -170,7 +169,6 @@ import {
   LineElement,
 } from "chart.js";
 
-// Đăng ký toàn bộ các thành phần đồ họa
 ChartJS.register(
   Title,
   Tooltip,
@@ -193,7 +191,7 @@ export default {
       tongMuon: 0,
       tongDangMuon: 0,
 
-      // 1. Biểu đồ Cột (Bar)
+      // Biểu đồ Cột (Bar)
       chartDataBar: {
         labels: [],
         datasets: [
@@ -206,7 +204,7 @@ export default {
         ],
       },
 
-      // 2. Biểu đồ Tròn (Pie)
+      // Biểu đồ Tròn (Pie)
       chartDataPie: {
         labels: ["Đã Trả", "Đang Mượn"],
         datasets: [
@@ -217,7 +215,7 @@ export default {
         ],
       },
 
-      // 3. Biểu đồ Đường (Line)
+      // Biểu đồ Đường (Line)
       chartDataLine: {
         labels: [],
         datasets: [
@@ -225,19 +223,18 @@ export default {
             label: "Lượt mượn sách",
             borderColor: "#ffc107",
             backgroundColor: "#ffc107",
-            tension: 0.3, // Làm cong đường nối
+            tension: 0.3,
             fill: false,
             data: [],
           },
         ],
       },
 
-      // Cấu hình chung cho Cột và Đường
       chartOptions: {
         responsive: true,
         maintainAspectRatio: false,
       },
-      // Cấu hình riêng cho Tròn
+
       chartOptionsPie: {
         responsive: true,
         maintainAspectRatio: false,

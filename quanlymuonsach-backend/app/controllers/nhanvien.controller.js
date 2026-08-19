@@ -7,25 +7,25 @@ const ApiError = require("../api-error");
 exports.create = async (req, res, next) => {
     const { HoTenNV, ChucVu, Password, SoDienThoai } = req.body;
     if (!HoTenNV || !ChucVu || !Password || !SoDienThoai) {
-        return next(new ApiError(400, "Lỗi: Vui lòng nhập đầy đủ thông tin bắt buộc (Họ Tên, Chức vụ, Mật khẩu, SĐT)!"));
+        return next(new ApiError(400, "Lỗi: Vui lòng nhập đầy đủ thông tin bắt buộc!"));
     }
-
-    // Tạo mã nhân viên ngẫu nhiên
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    req.body.MSNV = "NV" + randomNum;
 
     try {
         const nhanvienService = new NhanVienService(MongoDB.client);
+        const dsSDT = await nhanvienService.find({ SoDienThoai: SoDienThoai });
+        if (dsSDT.length > 0) {
+             return next(new ApiError(400, "Lỗi: Số điện thoại này đã thuộc về một Nhân viên khác!"));
+        }
+
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        req.body.MSNV = "NV" + randomNum;
+
         const document = await nhanvienService.create(req.body);
         return res.send(document);
     } catch (error) {
-        if (error.message.includes("đã tồn tại")) {
-            return next(new ApiError(400, "Hệ thống bận, vui lòng thử thêm lại!"));
-        }
         return next(new ApiError(500, "Đã xảy ra lỗi khi tạo Nhân viên"));
     }
 };
-
 
 // Lấy danh sách tất cả Nhân viên
 exports.findAll = async (req, res, next) => {
@@ -38,7 +38,6 @@ exports.findAll = async (req, res, next) => {
     }
     return res.send(documents);
 };
-
 
 // Lấy 1 Nhân viên theo ID
 exports.findOne = async (req, res, next) => {
@@ -54,27 +53,36 @@ exports.findOne = async (req, res, next) => {
     }
 };
 
-
 // Cập nhật thông tin Nhân viên
 exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
         return next(new ApiError(400, "Dữ liệu cập nhật không được rỗng"));
     }
+
     if (req.body.Password) {
         delete req.body.Password;
     }
+
     try {
         const nhanvienService = new NhanVienService(MongoDB.client);
+        if (req.body.SoDienThoai) {
+            const dsSDT = await nhanvienService.find({ SoDienThoai: req.body.SoDienThoai });
+            const isDuplicate = dsSDT.some(nv => nv._id.toString() !== req.params.id);
+            
+            if (isDuplicate) {
+                return next(new ApiError(400, "Lỗi: Số điện thoại này đã thuộc về một Nhân viên khác!"));
+            }
+        }
+
         const document = await nhanvienService.update(req.params.id, req.body);
         if (!document) {
             return next(new ApiError(404, "Không tìm thấy Nhân viên"));
         }
         return res.send({ message: "Cập nhật Nhân viên thành công" });
     } catch (error) {
-        return next(new ApiError(500, `Lỗi cập nhật Nhân viên có id=${req.params.id}`));
+        return next(new ApiError(500, `Lỗi cập nhật Nhân viên id=${req.params.id}`));
     }
 };
-
 
 // Xóa 1 Nhân viên
 exports.delete = async (req, res, next) => {
@@ -89,7 +97,6 @@ exports.delete = async (req, res, next) => {
         return next(new ApiError(500, `Không thể xóa Nhân viên có id=${req.params.id}`));
     }
 };
-
 
 // Đăng nhập Nhân viên
 exports.login = async (req, res, next) => {
