@@ -92,9 +92,20 @@
               class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center"
             >
               <span class="text-muted small fw-medium">Giá bìa:</span>
-              <span class="text-danger fw-bold fs-5">
-                {{ sach.DonGia.toLocaleString("vi-VN") }}đ
-              </span>
+              <div
+                class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center"
+              >
+                <span class="text-danger fw-bold fs-5">
+                  {{ sach.DonGia.toLocaleString("vi-VN") }}đ
+                </span>
+                <button
+                  class="btn btn-sm btn-primary rounded-pill px-3 fw-bold shadow-sm"
+                  :disabled="sach.SoQuyen <= 0"
+                  @click="muonSach(sach)"
+                >
+                  Mượn Ngay
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -105,6 +116,8 @@
 
 <script>
 import SachService from "@/services/sach.service";
+import TheoDoiMuonSachService from "@/services/theodoimuonsach.service";
+import Swal from "sweetalert2";
 
 export default {
   name: "TrangSach",
@@ -136,6 +149,70 @@ export default {
     xoaTimKiem() {
       this.searchText = "";
       this.layDanhSach();
+    },
+    async muonSach(sach) {
+      const userData = localStorage.getItem("docgia_khachhang");
+      if (!userData) {
+        Swal.fire(
+          "Cảnh báo",
+          "Vui lòng đăng nhập tài khoản để mượn sách!",
+          "warning",
+        );
+        this.$router.push("/tai-khoan");
+        return;
+      }
+
+      const user = JSON.parse(userData);
+      const homNay = new Date().toISOString().split("T")[0];
+
+      const { value: hanTra } = await Swal.fire({
+        title: "Đăng ký mượn sách",
+        html: `
+          <p class="mb-3">Sách: <strong class="text-primary">${sach.TenSach}</strong></p>
+          <div class="text-start">
+            <label class="form-label fw-medium small">Chọn ngày hẹn trả:</label>
+            <input type="date" id="hanTraInput" class="form-control" min="${homNay}">
+          </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Xác nhận mượn",
+        cancelButtonText: "Hủy",
+        preConfirm: () => {
+          const date = document.getElementById("hanTraInput").value;
+          if (!date) {
+            Swal.showValidationMessage("Vui lòng chọn ngày hẹn trả");
+          } else if (date < homNay) {
+            Swal.showValidationMessage(
+              "Ngày hẹn trả không được nhỏ hơn ngày hôm nay",
+            );
+          }
+          return date;
+        },
+      });
+
+      if (hanTra) {
+        try {
+          await TheoDoiMuonSachService.create({
+            MaDocGia: user.MaDocGia,
+            MaSach: sach.MaSach,
+            NgayMuon: homNay,
+            HanTra: hanTra,
+          });
+          Swal.fire(
+            "Thành công",
+            "Đăng ký mượn thành công! Vui lòng chờ thủ thư duyệt.",
+            "success",
+          );
+          this.layDanhSach();
+        } catch (error) {
+          Swal.fire(
+            "Lỗi",
+            error.response?.data?.message || "Không thể thực hiện mượn sách",
+            "error",
+          );
+        }
+      }
     },
   },
 };

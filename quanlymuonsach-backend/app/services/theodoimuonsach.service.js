@@ -12,6 +12,8 @@ class TheoDoiMuonSachService {
             MaSach: payload.MaSach,
             NgayMuon: payload.NgayMuon || new Date().toISOString().split('T')[0],
             NgayTra: payload.NgayTra || null, 
+            HanTra: payload.HanTra, 
+            TrangThai: payload.TrangThai || 'Chờ duyệt', 
         };
         
         Object.keys(theodoi).forEach(
@@ -20,7 +22,7 @@ class TheoDoiMuonSachService {
         return theodoi;
     }
 
-    // Thêm mới (Create)
+    // Tạo (Create)
     async create(payload) {
         const theodoi = this.extractData(payload);
         const sach = await this.Sach.findOne({ MaSach: theodoi.MaSach });
@@ -28,18 +30,18 @@ class TheoDoiMuonSachService {
             throw new Error("Mã sách không tồn tại trong hệ thống!");
         }
 
-        // Đếm số lượng người đang mượn cuốn sách này (NgayTra = null)
+        // Những người đang giữ sách (bao gồm Chờ duyệt, Đang mượn, Quá hạn)
         const soLuongDangMuon = await this.TheoDoi.countDocuments({
             MaSach: theodoi.MaSach,
-            NgayTra: null 
+            TrangThai: { $in: ['Chờ duyệt', 'Đang mượn', 'Quá hạn'] } 
         });
-        // Tính toán số sách còn thực tế
+
+        // Tính toán sách còn trống
         const soSachConLai = sach.SoQuyen - soLuongDangMuon;
         if (soSachConLai <= 0) {
-            throw new Error("Sách này hiện đã được mượn hết, vui lòng quay lại sau!");
+            throw new Error("Sách này hiện đã hết, vui lòng quay lại sau!");
         }
 
-        // Ghi nhận lượt mượn 
         const result = await this.TheoDoi.insertOne(theodoi);
         return await this.TheoDoi.findOne({ _id: result.insertedId });
     }
@@ -50,14 +52,12 @@ class TheoDoiMuonSachService {
         return await cursor.toArray();
     }
 
-    // Lấy chi tiết 1 lượt mượn theo ID (Read one)
     async findById(id) {
         return await this.TheoDoi.findOne({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
 
-    // Cập nhật (Update) (ghi nhận trả sách)
     async update(id, payload) {
         const filter = {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
@@ -71,7 +71,6 @@ class TheoDoiMuonSachService {
         return result;
     }
 
-    // Xóa (Delete)
     async delete(id) {
         const result = await this.TheoDoi.findOneAndDelete({
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
@@ -79,5 +78,4 @@ class TheoDoiMuonSachService {
         return result;
     }
 }
-
 module.exports = TheoDoiMuonSachService;

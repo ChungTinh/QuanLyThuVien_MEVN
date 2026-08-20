@@ -23,6 +23,7 @@
                 <th class="py-3">Độc Giả</th>
                 <th class="py-3">Sách Mượn</th>
                 <th class="py-3">Ngày Mượn</th>
+                <th class="py-3 text-danger">Hạn Trả</th>
                 <th class="py-3">Ngày Trả</th>
                 <th class="py-3">Trạng Thái</th>
                 <th class="py-3">Hành Động</th>
@@ -30,7 +31,7 @@
             </thead>
             <tbody class="border-top-0">
               <tr v-if="phieuMuons.length === 0">
-                <td colspan="6" class="text-center py-5 text-muted">
+                <td colspan="7" class="text-center py-5 text-muted">
                   Chưa có dữ liệu mượn sách.
                 </td>
               </tr>
@@ -42,12 +43,25 @@
                   {{ layTenSach(phieu.MaSach) }}
                 </td>
                 <td>{{ phieu.NgayMuon }}</td>
+                <td class="text-danger fw-medium">{{ phieu.HanTra }}</td>
                 <td class="text-muted">{{ phieu.NgayTra || "---" }}</td>
+
+                <!-- TRẠNG THÁI -->
                 <td>
                   <span
-                    v-if="phieu.NgayTra"
+                    v-if="phieu.TrangThai === 'Đã trả'"
                     class="badge bg-success rounded-pill px-3 shadow-sm"
                     >Đã trả</span
+                  >
+                  <span
+                    v-else-if="phieu.TrangThai === 'Chờ duyệt'"
+                    class="badge bg-info text-dark rounded-pill px-3 shadow-sm"
+                    >Chờ duyệt</span
+                  >
+                  <span
+                    v-else-if="phieu.TrangThai === 'Quá hạn'"
+                    class="badge bg-danger rounded-pill px-3 shadow-sm"
+                    >Quá hạn</span
                   >
                   <span
                     v-else
@@ -56,54 +70,40 @@
                   >
                 </td>
 
-                <!-- CỘT HÀNH ĐỘNG -->
+                <!-- HÀNH ĐỘNG -->
                 <td>
                   <div class="d-flex gap-2 justify-content-center">
                     <button
-                      v-if="!phieu.NgayTra"
+                      v-if="phieu.TrangThai === 'Chờ duyệt'"
+                      @click="duyetDon(phieu)"
+                      class="btn btn-sm btn-info text-dark rounded-pill px-3 fw-bold shadow-sm"
+                    >
+                      Duyệt
+                    </button>
+
+                    <button
+                      v-if="
+                        phieu.TrangThai === 'Đang mượn' ||
+                        phieu.TrangThai === 'Quá hạn'
+                      "
                       @click="xacNhanTra(phieu._id)"
                       class="btn btn-sm btn-primary rounded-pill px-3 fw-medium shadow-sm d-flex align-items-center gap-1"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        fill="currentColor"
-                        class="bi bi-check2-circle"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"
-                        />
-                        <path
-                          d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"
-                        />
-                      </svg>
                       Nhận
                     </button>
+
                     <span
-                      v-else
-                      class="badge bg-light text-success border border-success rounded-pill px-3 py-2 fw-medium d-flex align-items-center"
+                      v-if="phieu.TrangThai === 'Đã trả'"
+                      class="badge bg-light text-success border border-success rounded-pill px-3 py-2 fw-medium"
                     >
                       Hoàn tất
                     </span>
 
+                    <!-- Nút Xóa -->
                     <button
                       @click="xoaPhieu(phieu._id)"
                       class="btn btn-sm btn-danger rounded-pill px-3 fw-medium shadow-sm d-flex align-items-center gap-1"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        fill="currentColor"
-                        class="bi bi-trash3"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.813 1H3.188l.836 10.42a1 1 0 0 0 .997.92h6.23a1 1 0 0 0 .997-.92l.836-10.42ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v8.5a.5.5 0 0 0 1 0V5Zm-6 0a.5.5 0 0 0-1 0v8.5a.5.5 0 0 0 1 0V5Z"
-                        />
-                      </svg>
                       Xóa
                     </button>
                   </div>
@@ -178,16 +178,30 @@
                 </select>
               </div>
 
-              <div class="mb-4">
-                <label class="form-label fw-bold text-secondary small"
-                  >Ngày Mượn</label
-                >
-                <input
-                  type="text"
-                  class="form-control text-muted bg-light"
-                  v-model="formData.NgayMuon"
-                  readonly
-                />
+              <div class="row mb-4">
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small"
+                    >Ngày Mượn</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control text-muted bg-light"
+                    v-model="formData.NgayMuon"
+                    readonly
+                  />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold text-secondary small"
+                    >Hẹn Ngày Trả</label
+                  >
+                  <input
+                    type="date"
+                    class="form-control"
+                    v-model="formData.HanTra"
+                    :min="formData.NgayMuon"
+                    required
+                  />
+                </div>
               </div>
 
               <div class="text-end">
@@ -232,6 +246,7 @@ export default {
         MaDocGia: "",
         MaSach: "",
         NgayMuon: "",
+        HanTra: "",
       },
     };
   },
@@ -247,6 +262,8 @@ export default {
         this.docGias = await DocGiaService.getAll();
         this.sachs = await SachService.getAll();
         this.phieuMuons = await TheoDoiMuonSachService.getAll();
+        // Sắp xếp đơn mới nhất lên đầu
+        this.phieuMuons.reverse();
       } catch (error) {
         console.error("Lỗi lấy dữ liệu:", error);
       }
@@ -268,13 +285,18 @@ export default {
         MaDocGia: "",
         MaSach: "",
         NgayMuon: homNay,
+        HanTra: "",
       };
       this.modalInstance.show();
     },
 
     async taoPhieu() {
       try {
-        await TheoDoiMuonSachService.create(this.formData);
+        // Admin tạo thì auto chuyển thành "Đang mượn" luôn, không cần chờ duyệt
+        await TheoDoiMuonSachService.create({
+          ...this.formData,
+          TrangThai: "Đang mượn",
+        });
         Swal.fire("Thành công!", "Tạo phiếu mượn thành công!", "success");
         this.modalInstance.hide();
         await this.loadTatCaDuLieu();
@@ -284,6 +306,31 @@ export default {
           error.response?.data?.message || "Không thể tạo phiếu",
           "error",
         );
+      }
+    },
+
+    async duyetDon(phieu) {
+      // XỬ LÝ CẠNH TRANH (CONCURRENCY)
+      // Lấy trạng thái mới nhất từ server xem đơn này còn "Chờ duyệt" không
+      try {
+        const checkPhieu = await TheoDoiMuonSachService.findById(phieu._id);
+        if (!checkPhieu || checkPhieu.TrangThai !== "Chờ duyệt") {
+          Swal.fire(
+            "Thất bại",
+            "Đơn này đã được xử lý bởi người khác hoặc bị khách hủy!",
+            "warning",
+          );
+          this.loadTatCaDuLieu();
+          return;
+        }
+
+        await TheoDoiMuonSachService.update(phieu._id, {
+          TrangThai: "Đang mượn",
+        });
+        Swal.fire("Đã duyệt!", "Giao sách cho khách thành công.", "success");
+        this.loadTatCaDuLieu();
+      } catch (error) {
+        Swal.fire("Lỗi", "Có lỗi xảy ra khi duyệt đơn!", "error");
       }
     },
 
@@ -302,7 +349,10 @@ export default {
       if (result.isConfirmed) {
         try {
           const ngayTra = new Date().toISOString().split("T")[0];
-          await TheoDoiMuonSachService.update(idPhieu, { NgayTra: ngayTra });
+          await TheoDoiMuonSachService.update(idPhieu, {
+            NgayTra: ngayTra,
+            TrangThai: "Đã trả",
+          });
           Swal.fire(
             "Thành công!",
             "Đã cập nhật trạng thái Trả sách!",

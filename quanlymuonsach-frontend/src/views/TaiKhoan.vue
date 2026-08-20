@@ -601,6 +601,7 @@
               </div>
 
               <!-- TAB LỊCH SỬ MƯỢN SÁCH -->
+              <!-- TAB LỊCH SỬ MƯỢN SÁCH -->
               <div class="tab-pane fade" id="history">
                 <div v-if="loadingHistory" class="text-center py-4">
                   <span
@@ -624,8 +625,10 @@
                         <tr>
                           <th class="fw-medium">Tên Sách</th>
                           <th class="fw-medium">Ngày Mượn</th>
+                          <th class="fw-medium">Hạn Trả</th>
                           <th class="fw-medium">Ngày Trả</th>
                           <th class="fw-medium">Trạng Thái</th>
+                          <th class="fw-medium">Hành Động</th>
                         </tr>
                       </thead>
                       <tbody class="border-top-0">
@@ -634,20 +637,48 @@
                             {{ item.TenSach }}
                           </td>
                           <td>{{ item.NgayMuon }}</td>
+                          <td class="text-danger fw-medium">
+                            {{ item.HanTra }}
+                          </td>
                           <td class="text-muted">
                             {{ item.NgayTra || "---" }}
                           </td>
                           <td>
                             <span
-                              v-if="item.NgayTra"
+                              v-if="item.TrangThai === 'Đã trả'"
                               class="badge bg-success rounded-pill px-3"
                               >Đã trả</span
                             >
                             <span
-                              v-else
+                              v-else-if="item.TrangThai === 'Chờ duyệt'"
+                              class="badge bg-info text-dark rounded-pill px-3"
+                              >Chờ duyệt</span
+                            >
+                            <span
+                              v-else-if="item.TrangThai === 'Đang mượn'"
                               class="badge bg-warning text-dark rounded-pill px-3"
                               >Đang mượn</span
                             >
+                            <span
+                              v-else-if="item.TrangThai === 'Quá hạn'"
+                              class="badge bg-danger rounded-pill px-3"
+                              >Quá hạn</span
+                            >
+                            <span
+                              v-else
+                              class="badge bg-secondary rounded-pill px-3"
+                              >{{ item.TrangThai || "Đang mượn" }}</span
+                            >
+                          </td>
+                          <td>
+                            <button
+                              v-if="item.TrangThai === 'Chờ duyệt'"
+                              @click="huyDonMuon(item._id)"
+                              class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold"
+                            >
+                              Hủy đơn
+                            </button>
+                            <span v-else class="text-muted small">---</span>
                           </td>
                         </tr>
                       </tbody>
@@ -730,6 +761,7 @@ export default {
         this.isLoading = false;
       }
     },
+
     handleLogout() {
       Swal.fire({
         title: "Xác nhận đăng xuất?",
@@ -748,6 +780,7 @@ export default {
         }
       });
     },
+
     async updateInfo() {
       try {
         await DocGiaService.update(this.currentUser._id, this.editUser);
@@ -796,6 +829,7 @@ export default {
         );
       }
     },
+
     async loadLichSu() {
       this.loadingHistory = true;
       try {
@@ -817,6 +851,7 @@ export default {
         this.loadingHistory = false;
       }
     },
+
     async handleRegister() {
       this.isLoading = true;
       this.errorMessage = "";
@@ -837,6 +872,29 @@ export default {
           error.response?.data?.message || "Lỗi khi đăng ký tài khoản!";
       } finally {
         this.isLoading = false;
+      }
+    },
+
+    async huyDonMuon(id) {
+      const result = await Swal.fire({
+        title: "Xác nhận hủy đơn?",
+        text: "Bạn có chắc chắn muốn hủy yêu cầu mượn cuốn sách này?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Hủy đơn",
+        cancelButtonText: "Đóng",
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await TheoDoiMuonSachService.delete(id);
+          Swal.fire("Thành công!", "Đã hủy đơn đăng ký mượn sách.", "success");
+          this.loadLichSu();
+        } catch (error) {
+          Swal.fire("Lỗi", "Không thể hủy đơn mượn này", "error");
+        }
       }
     },
   },
