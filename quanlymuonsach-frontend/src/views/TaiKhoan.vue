@@ -601,7 +601,6 @@
               </div>
 
               <!-- TAB LỊCH SỬ MƯỢN SÁCH -->
-              <!-- TAB LỊCH SỬ MƯỢN SÁCH -->
               <div class="tab-pane fade" id="history">
                 <div v-if="loadingHistory" class="text-center py-4">
                   <span
@@ -648,6 +647,11 @@
                               v-if="item.TrangThai === 'Đã trả'"
                               class="badge bg-success rounded-pill px-3"
                               >Đã trả</span
+                            >
+                            <span
+                              v-else-if="item.TrangThai === 'Đã trả (Trễ)'"
+                              class="badge bg-secondary rounded-pill px-3"
+                              >Đã trả (Trễ)</span
                             >
                             <span
                               v-else-if="item.TrangThai === 'Chờ duyệt'"

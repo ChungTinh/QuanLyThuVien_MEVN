@@ -39,7 +39,6 @@ exports.findAll = async (req, res, next) => {
     try {
         const theodoiService = new TheoDoiMuonSachService(MongoDB.client);
         
-        // --- HÀM TỰ ĐỘNG QUÉT VÀ CẬP NHẬT TRẠNG THÁI QUÁ HẠN ---
         const homNay = new Date().toISOString().split('T')[0];
         
         await theodoiService.TheoDoi.updateMany(

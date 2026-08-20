@@ -54,6 +54,11 @@
                     >Đã trả</span
                   >
                   <span
+                    v-else-if="phieu.TrangThai === 'Đã trả (Trễ)'"
+                    class="badge bg-secondary rounded-pill px-3 shadow-sm"
+                    >Đã trả (Trễ)</span
+                  >
+                  <span
                     v-else-if="phieu.TrangThai === 'Chờ duyệt'"
                     class="badge bg-info text-dark rounded-pill px-3 shadow-sm"
                     >Chờ duyệt</span
@@ -81,25 +86,28 @@
                       Duyệt
                     </button>
 
+                    <!-- CHÚ Ý: Đổi xacNhanTra(phieu._id) thành xacNhanTra(phieu) -->
                     <button
                       v-if="
                         phieu.TrangThai === 'Đang mượn' ||
                         phieu.TrangThai === 'Quá hạn'
                       "
-                      @click="xacNhanTra(phieu._id)"
+                      @click="xacNhanTra(phieu)"
                       class="btn btn-sm btn-primary rounded-pill px-3 fw-medium shadow-sm d-flex align-items-center gap-1"
                     >
                       Nhận
                     </button>
 
                     <span
-                      v-if="phieu.TrangThai === 'Đã trả'"
+                      v-if="
+                        phieu.TrangThai === 'Đã trả' ||
+                        phieu.TrangThai === 'Đã trả (Trễ)'
+                      "
                       class="badge bg-light text-success border border-success rounded-pill px-3 py-2 fw-medium"
                     >
                       Hoàn tất
                     </span>
 
-                    <!-- Nút Xóa -->
                     <button
                       @click="xoaPhieu(phieu._id)"
                       class="btn btn-sm btn-danger rounded-pill px-3 fw-medium shadow-sm d-flex align-items-center gap-1"
@@ -334,7 +342,8 @@ export default {
       }
     },
 
-    async xacNhanTra(idPhieu) {
+    // Nhận toàn bộ object phiếu thay vì chỉ id
+    async xacNhanTra(phieu) {
       const result = await Swal.fire({
         title: "Xác nhận trả sách?",
         text: "Khách hàng đã trả lại cuốn sách này?",
@@ -349,9 +358,14 @@ export default {
       if (result.isConfirmed) {
         try {
           const ngayTra = new Date().toISOString().split("T")[0];
-          await TheoDoiMuonSachService.update(idPhieu, {
+
+          // Tính toán trạng thái: Trả trễ hay Đúng hạn
+          const trangThaiMoi =
+            ngayTra > phieu.HanTra ? "Đã trả (Trễ)" : "Đã trả";
+
+          await TheoDoiMuonSachService.update(phieu._id, {
             NgayTra: ngayTra,
-            TrangThai: "Đã trả",
+            TrangThai: trangThaiMoi,
           });
           Swal.fire(
             "Thành công!",

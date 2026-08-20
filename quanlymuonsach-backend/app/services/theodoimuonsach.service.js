@@ -23,7 +23,6 @@ class TheoDoiMuonSachService {
     }
 
     // Tạo (Create)
-    // Tạo (Create)
     async create(payload) {
         const theodoi = this.extractData(payload);
         const sach = await this.Sach.findOne({ MaSach: theodoi.MaSach });
@@ -31,6 +30,30 @@ class TheoDoiMuonSachService {
             throw new Error("Mã sách không tồn tại trong hệ thống!");
         }
 
+        // --- BẮT ĐẦU ĐOẠN KIỂM TRA PHẠT QUÁ HẠN 3 LẦN ---
+        const danhSachViPham = await this.TheoDoi.find({
+            MaDocGia: theodoi.MaDocGia,
+            TrangThai: { $in: ['Quá hạn', 'Đã trả (Trễ)'] }
+        }).toArray();
+
+        if (danhSachViPham.length >= 3) {
+            let thoiGianGanNhat = 0;
+            danhSachViPham.forEach(p => {
+                // Nếu chưa trả (đang quá hạn) thì lấy ngày hôm nay làm mốc, nếu trả trễ thì lấy ngày trả thực tế
+                const tg = p.NgayTra ? new Date(p.NgayTra).getTime() : new Date().getTime();
+                if (tg > thoiGianGanNhat) thoiGianGanNhat = tg;
+            });
+            
+            const ngayMoKhoa = new Date(thoiGianGanNhat);
+            ngayMoKhoa.setDate(ngayMoKhoa.getDate() + 3);
+
+            if (new Date() < ngayMoKhoa) {
+                const dateStr = ngayMoKhoa.toISOString().split('T')[0];
+                throw new Error(`Tài khoản bị tạm khóa mượn sách đến ${dateStr} do vi phạm quá hạn từ 3 lần trở lên!`);
+            }
+        }
+
+        // Những người đang giữ sách (bao gồm Chờ duyệt, Đang mượn, Quá hạn)
         const soSachKhachDangMuon = await this.TheoDoi.countDocuments({
             MaDocGia: theodoi.MaDocGia,
             TrangThai: { $in: ['Chờ duyệt', 'Đang mượn', 'Quá hạn'] } 
@@ -40,13 +63,12 @@ class TheoDoiMuonSachService {
             throw new Error("Bạn đã đạt giới hạn mượn tối đa 5 cuốn sách (chưa trả). Vui lòng trả bớt sách trước khi mượn thêm!");
         }
 
-        // Những người đang giữ sách (bao gồm Chờ duyệt, Đang mượn, Quá hạn)
+        // Tính toán sách còn trống
         const soLuongDangMuon = await this.TheoDoi.countDocuments({
             MaSach: theodoi.MaSach,
             TrangThai: { $in: ['Chờ duyệt', 'Đang mượn', 'Quá hạn'] } 
         });
 
-        // Tính toán sách còn trống
         const soSachConLai = sach.SoQuyen - soLuongDangMuon;
         if (soSachConLai <= 0) {
             throw new Error("Sách này hiện đã hết, vui lòng quay lại sau!");
