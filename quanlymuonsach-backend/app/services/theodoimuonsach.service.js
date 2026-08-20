@@ -23,11 +23,21 @@ class TheoDoiMuonSachService {
     }
 
     // Tạo (Create)
+    // Tạo (Create)
     async create(payload) {
         const theodoi = this.extractData(payload);
         const sach = await this.Sach.findOne({ MaSach: theodoi.MaSach });
         if (!sach) {
             throw new Error("Mã sách không tồn tại trong hệ thống!");
+        }
+
+        const soSachKhachDangMuon = await this.TheoDoi.countDocuments({
+            MaDocGia: theodoi.MaDocGia,
+            TrangThai: { $in: ['Chờ duyệt', 'Đang mượn', 'Quá hạn'] } 
+        });
+
+        if (soSachKhachDangMuon >= 5) {
+            throw new Error("Bạn đã đạt giới hạn mượn tối đa 5 cuốn sách (chưa trả). Vui lòng trả bớt sách trước khi mượn thêm!");
         }
 
         // Những người đang giữ sách (bao gồm Chờ duyệt, Đang mượn, Quá hạn)
