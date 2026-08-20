@@ -311,9 +311,9 @@ export default {
 
     async duyetDon(phieu) {
       // XỬ LÝ CẠNH TRANH (CONCURRENCY)
-      // Lấy trạng thái mới nhất từ server xem đơn này còn "Chờ duyệt" không
       try {
-        const checkPhieu = await TheoDoiMuonSachService.findById(phieu._id);
+        const checkPhieu = await TheoDoiMuonSachService.get(phieu._id);
+
         if (!checkPhieu || checkPhieu.TrangThai !== "Chờ duyệt") {
           Swal.fire(
             "Thất bại",
